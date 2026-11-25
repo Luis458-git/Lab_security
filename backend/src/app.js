@@ -3,7 +3,7 @@ import cookieParser from 'cookie-parser';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import env from './config/env.js';
-import { configureHelmet, configureCors } from './security/helmet.security.js';
+import { configureHelmet, configureCors, configurePermissionsPolicy } from './security/helmet.security.js';
 import { apiRateLimiter } from './security/rateLimit.security.js';
 import routes from './routes/index.routes.js';
 import errorHandler from './middlewares/error.middleware.js';
@@ -23,6 +23,9 @@ app.disable('x-powered-by');
 
 // Cabeceras de seguridad estrictas (Helmet + CSP)
 app.use(configureHelmet());
+
+// Política de permisos estricta del navegador (A+ en SecurityHeaders)
+app.use(configurePermissionsPolicy());
 
 // CORS restringido con soporte de credenciales seguras
 app.use(configureCors());

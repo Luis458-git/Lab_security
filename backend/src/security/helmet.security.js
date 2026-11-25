@@ -61,6 +61,21 @@ export const configureHelmet = () => {
 };
 
 /**
+ * Middleware para la cabecera Permissions-Policy (reemplazo moderno de Feature-Policy).
+ * Restringe el acceso a APIs sensibles del navegador (cámara, micrófono, geolocalización, etc.)
+ * para alcanzar la calificación máxima A+ en auditorías de seguridad (SecurityHeaders.com).
+ */
+export const configurePermissionsPolicy = () => {
+  return (req, res, next) => {
+    res.setHeader(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=()'
+    );
+    next();
+  };
+};
+
+/**
  * Configuración de Cross-Origin Resource Sharing (CORS) estricta
  * Permite únicamente el frontend legítimo con credenciales autorizadas.
  */
@@ -99,5 +114,6 @@ export const configureCors = () => {
 
 export default {
   configureHelmet,
+  configurePermissionsPolicy,
   configureCors
 };
