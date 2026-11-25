@@ -11,7 +11,7 @@ on:
       target_url:
         description: 'URL pública de tu aplicación en Render'
         required: true
-        default: 'https://tu-app.onrender.com'
+        default: 'https://securevault-adn6.onrender.com'
 
 jobs:
   zap_scan:
@@ -19,7 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write
 
     steps:
       - name: Checkout del Repositorio
@@ -28,19 +27,24 @@ jobs:
       - name: Despertar la app en Render (Wake-up Ping)
         run: |
           echo "Despertando el servicio en Render por si está en modo reposo..."
-          curl -s -i "${{ github.event.inputs.target_url }}/health" || true
+          curl -k -s -i "${{ github.event.inputs.target_url }}/health" || true
           sleep 10
 
       - name: Ejecutar Contenedor Docker de OWASP ZAP (Cloud DAST)
         run: |
-          echo "Ejecutando contenedor oficial ghcr.io/zaproxy/zaproxy:stable en la nube..."
+          echo "Iniciando contenedor oficial ghcr.io/zaproxy/zaproxy:stable..."
           mkdir -p zap-reports
-          docker run --rm -v $(pwd)/zap-reports:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+          chmod 777 zap-reports
+
+          docker run --user root --rm -v $(pwd)/zap-reports:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
             -t "${{ github.event.inputs.target_url }}" \
+            -I \
             -r report_html.html \
             -w report_md.md \
             -J report_json.json || true
-          echo "Escaneo de OWASP ZAP finalizado."
+
+          echo "Escaneo completado. Verificando archivos generados:"
+          ls -la zap-reports/
 
       - name: Publicar Reporte Forense en Resumen de GitHub
         if: always()
@@ -48,6 +52,8 @@ jobs:
           if [ -f zap-reports/report_md.md ]; then
             echo "### 🛡️ Reporte Completo de Ciberseguridad OWASP ZAP" >> $GITHUB_STEP_SUMMARY
             cat zap-reports/report_md.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ No se generó reporte Markdown de ZAP" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Guardar Reporte HTML y JSON como Artefactos
@@ -55,4 +61,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: reporte-owasp-zap-dast
-          path: zap-reports/*
+          path: zap-reports/
+          if-no-files-found: warn
