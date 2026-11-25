@@ -38,6 +38,11 @@ export const getUserNotes = async (userId) => {
       id: row.id,
       title,
       content,
+      cryptoMeta: {
+        ciphertext: row.content_encrypted,
+        iv: row.content_iv,
+        authTag: row.content_tag
+      },
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -103,6 +108,11 @@ export const getNoteById = async (userId, noteId, clientIp, userAgent) => {
     id: note.id,
     title,
     content,
+    cryptoMeta: {
+      ciphertext: note.content_encrypted,
+      iv: note.content_iv,
+      authTag: note.content_tag
+    },
     createdAt: note.created_at,
     updatedAt: note.updated_at
   };
@@ -171,6 +181,11 @@ export const createNote = async (userId, { title, content }, clientIp, userAgent
     id: createdNote.id,
     title,
     content,
+    cryptoMeta: {
+      ciphertext: encContent.ciphertext,
+      iv: encContent.iv,
+      authTag: encContent.authTag
+    },
     createdAt: createdNote.created_at,
     updatedAt: createdNote.updated_at
   };
@@ -273,6 +288,11 @@ export const updateNote = async (userId, noteId, { title, content }, clientIp, u
     id: noteId,
     title: finalTitle,
     content: finalContent,
+    cryptoMeta: {
+      ciphertext: newContentEnc,
+      iv: newContentIv,
+      authTag: newContentTag
+    },
     updatedAt: updateRes.rows[0].updated_at
   };
 };

@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { Lock, Edit2, Trash2, Calendar, ShieldCheck } from 'lucide-react';
+import { Lock, Edit2, Trash2, Calendar, ShieldCheck, Eye, EyeOff, Copy, Check, Terminal } from 'lucide-react';
 
 export const NoteCard = ({ note, onEdit, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showCrypto, setShowCrypto] = useState(false);
+  const [copiedField, setCopiedField] = useState(null);
+
+  const copyToClipboard = (text, fieldName) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
 
   const handleDelete = async () => {
     if (window.confirm('¿Confirmas la eliminación permanente de esta nota cifrada de la bóveda?')) {
@@ -31,16 +39,83 @@ export const NoteCard = ({ note, onEdit, onDelete }) => {
           <h3 className="font-semibold text-white text-base line-clamp-1 group-hover:text-vault-emerald transition-colors font-sans">
             {note.title}
           </h3>
-          <span className="shrink-0 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/60 text-vault-emerald border border-emerald-800/40 font-mono font-medium">
+          <button
+            onClick={() => setShowCrypto(!showCrypto)}
+            className="shrink-0 inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full bg-emerald-950/60 hover:bg-emerald-900/60 text-vault-emerald border border-emerald-800/40 font-mono font-medium transition-colors cursor-pointer"
+            title="Ver / Ocultar datos criptográficos en BD (IV, Tag, Ciphertext)"
+          >
             <Lock className="w-2.5 h-2.5 text-vault-emerald" />
-            <span>Cifrado AES-256-GCM</span>
-          </span>
+            <span>{showCrypto ? 'Ver Texto Plano' : 'AES-256-GCM'}</span>
+          </button>
         </div>
 
-        {/* Content body rendered strictly as raw text node (OWASP A05: XSS Immune) */}
-        <p className="text-gray-300 text-sm whitespace-pre-wrap break-words line-clamp-4 font-sans leading-relaxed select-text">
-          {note.content}
-        </p>
+        {/* Content body: Muestra el texto plano descifrado O los metadatos criptográficos según toggle */}
+        {!showCrypto ? (
+          <p className="text-gray-300 text-sm whitespace-pre-wrap break-words line-clamp-4 font-sans leading-relaxed select-text">
+            {note.content}
+          </p>
+        ) : (
+          <div className="bg-vault-bg/90 border border-emerald-900/50 rounded-lg p-3 space-y-2.5 font-mono text-[11px] animate-fadeIn">
+            <div className="flex items-center justify-between text-vault-emerald pb-1.5 border-b border-emerald-900/40">
+              <span className="flex items-center gap-1 font-semibold text-[10px] uppercase tracking-wider">
+                <Terminal className="w-3 h-3" />
+                Cifrado en Reposo (PostgreSQL)
+              </span>
+              <span className="text-[10px] text-gray-500">AES-256-GCM</span>
+            </div>
+
+            {/* Ciphertext */}
+            <div>
+              <div className="flex items-center justify-between text-gray-400 mb-0.5">
+                <span className="text-[10px] text-gray-300 font-bold">1. Ciphertext (Cifrado):</span>
+                <button
+                  onClick={() => copyToClipboard(note.cryptoMeta?.ciphertext || '', 'ciphertext')}
+                  className="hover:text-white transition-colors"
+                  title="Copiar Ciphertext"
+                >
+                  {copiedField === 'ciphertext' ? <Check className="w-3 h-3 text-vault-emerald" /> : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
+              <p className="text-emerald-400/90 break-all bg-[#0d131f] p-1.5 rounded border border-gray-800 text-[10px] max-h-16 overflow-y-auto select-all">
+                {note.cryptoMeta?.ciphertext || 'No disponible'}
+              </p>
+            </div>
+
+            {/* Initialization Vector (IV) */}
+            <div>
+              <div className="flex items-center justify-between text-gray-400 mb-0.5">
+                <span className="text-[10px] text-gray-300 font-bold">2. Vector de Inicialización (IV - 12B):</span>
+                <button
+                  onClick={() => copyToClipboard(note.cryptoMeta?.iv || '', 'iv')}
+                  className="hover:text-white transition-colors"
+                  title="Copiar IV"
+                >
+                  {copiedField === 'iv' ? <Check className="w-3 h-3 text-vault-emerald" /> : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
+              <p className="text-cyan-400/90 break-all bg-[#0d131f] p-1.5 rounded border border-gray-800 text-[10px] select-all">
+                {note.cryptoMeta?.iv || 'No disponible'}
+              </p>
+            </div>
+
+            {/* Authentication Tag */}
+            <div>
+              <div className="flex items-center justify-between text-gray-400 mb-0.5">
+                <span className="text-[10px] text-gray-300 font-bold">3. Auth Tag (Etiqueta GCM - 16B):</span>
+                <button
+                  onClick={() => copyToClipboard(note.cryptoMeta?.authTag || '', 'authTag')}
+                  className="hover:text-white transition-colors"
+                  title="Copiar Auth Tag"
+                >
+                  {copiedField === 'authTag' ? <Check className="w-3 h-3 text-vault-emerald" /> : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
+              <p className="text-amber-400/90 break-all bg-[#0d131f] p-1.5 rounded border border-gray-800 text-[10px] select-all">
+                {note.cryptoMeta?.authTag || 'No disponible'}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer & Actions */}
