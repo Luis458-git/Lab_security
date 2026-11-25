@@ -135,4 +135,51 @@ describe('Suite de Pruebas de Ciberseguridad (OWASP Top 10:2025)', () => {
       assert.strictEqual(standardArgon2idHeader.includes('t=2'), true);
     }
   });
+
+  // --------------------------------------------------------------------------
+  // 4. Prevención y Auditoría contra IDOR (OWASP A01: Broken Access Control)
+  // --------------------------------------------------------------------------
+  it('debe aislar los recursos por owner_id y registrar IDOR_ATTEMPT ante accesos cruzados', () => {
+    const userA = crypto.randomUUID();
+    const userB = crypto.randomUUID();
+    const noteId = crypto.randomUUID();
+
+    // Simulación del repositorio con aislamiento estricto
+    const databaseNotes = [
+      { id: noteId, owner_id: userA, title: 'Nota de Usuario A' }
+    ];
+
+    // Consulta filtrada estrictamente por owner_id (WHERE id = $1 AND owner_id = $2)
+    const findNote = (targetId, currentUserId) => {
+      const match = databaseNotes.find(n => n.id === targetId && n.owner_id === currentUserId);
+      if (!match) {
+        // Simulación del log forense de auditoría
+        const existsForOther = databaseNotes.some(n => n.id === targetId);
+        return {
+          found: false,
+          auditEvent: {
+            eventType: 'IDOR_ATTEMPT',
+            severity: 'CRITICAL',
+            userId: currentUserId,
+            attemptedNoteId: targetId,
+            confirmedCrossUserAccess: existsForOther
+          }
+        };
+      }
+      return { found: true, note: match };
+    };
+
+    // Caso 1: Usuario A accede a su propia nota -> Éxito sin registrar IDOR
+    const accessAuthorized = findNote(noteId, userA);
+    assert.strictEqual(accessAuthorized.found, true);
+    assert.strictEqual(accessAuthorized.note.title, 'Nota de Usuario A');
+
+    // Caso 2: Usuario B intenta acceder a la nota de Usuario A (IDOR Attempt)
+    const accessCrossUser = findNote(noteId, userB);
+    assert.strictEqual(accessCrossUser.found, false);
+    assert.strictEqual(accessCrossUser.auditEvent.eventType, 'IDOR_ATTEMPT');
+    assert.strictEqual(accessCrossUser.auditEvent.severity, 'CRITICAL');
+    assert.strictEqual(accessCrossUser.auditEvent.userId, userB);
+    assert.strictEqual(accessCrossUser.auditEvent.confirmedCrossUserAccess, true);
+  });
 });

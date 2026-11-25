@@ -32,7 +32,7 @@ export const changeRole = async (req, res, next) => {
 
 export const getSecurityLogs = async (req, res, next) => {
   try {
-    const logs = await adminService.getSecurityLogs(req.query.limit);
+    const logs = await adminService.getSecurityLogs(req.query.limit, req.query.eventType);
     res.status(200).json({
       status: 200,
       logs

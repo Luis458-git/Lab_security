@@ -52,8 +52,14 @@ export const logSecurityEvent = async ({
       INSERT INTO security_logs (user_id, event_type, severity, ip_address, user_agent, details)
       VALUES ($1, $2, $3, $4, $5, $6)
     `;
+    // Validación y sanitización estricta de UUID para PostgreSQL
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const sanitizedUserId = (typeof userId === 'string' && uuidRegex.test(userId.trim()))
+      ? userId.trim()
+      : null;
+
     const params = [
-      userId,
+      sanitizedUserId,
       eventType,
       severity,
       ipAddress ? String(ipAddress).slice(0, 45) : null,

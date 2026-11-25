@@ -59,20 +59,21 @@ export const getUserNotes = async (userId) => {
  * Obtener una nota puntual por su ID verificando propiedad contra IDOR
  */
 export const getNoteById = async (userId, noteId, clientIp, userAgent) => {
-  // 1. Buscar la nota por su ID global
-  const noteCheck = await query('SELECT * FROM notes WHERE id = $1', [noteId]);
+  // Consulta filtrada directamente por id y owner_id (Mitigación IDOR A01:2025)
+  const result = await query(
+    `SELECT id, owner_id, title_encrypted, title_iv, title_tag,
+            content_encrypted, content_iv, content_tag, created_at, updated_at
+     FROM notes
+     WHERE id = $1 AND owner_id = $2`,
+    [noteId, userId]
+  );
 
-  if (noteCheck.rowCount === 0) {
-    const error = new Error('Nota no encontrada');
-    error.statusCode = 404;
-    throw error;
-  }
+  // Si la consulta filtrada por owner_id no devuelve registros (rowCount === 0)
+  if (result.rowCount === 0) {
+    // Verificación forense: determinar si la nota pertenece a otro usuario o no existe
+    const crossCheck = await query('SELECT owner_id FROM notes WHERE id = $1', [noteId]);
+    const isOtherUserNote = crossCheck.rowCount > 0;
 
-  const note = noteCheck.rows[0];
-
-  // 2. Control estricto de propiedad (Mitigación IDOR A01:2025)
-  if (note.owner_id !== userId) {
-    // Registrar intento malicioso de acceso a recurso ajeno
     await logSecurityEvent({
       userId,
       eventType: 'IDOR_ATTEMPT',
@@ -81,16 +82,20 @@ export const getNoteById = async (userId, noteId, clientIp, userAgent) => {
       userAgent,
       details: {
         attemptedNoteId: noteId,
-        actualOwnerId: note.owner_id,
-        action: 'GET'
+        action: 'GET',
+        actualOwnerId: isOtherUserNote ? crossCheck.rows[0].owner_id : null,
+        confirmedCrossUserAccess: isOtherUserNote,
+        reason: isOtherUserNote ? 'CROSS_USER_NOTE_ACCESS' : 'UNOWNED_OR_NONEXISTENT_NOTE'
       }
     });
 
-    // Se responde 404 para evitar revelar la existencia de la nota ajena
+    // Se responde 404 genérico para evitar enumeración de recursos
     const error = new Error('Nota no encontrada');
     error.statusCode = 404;
     throw error;
   }
+
+  const note = result.rows[0];
 
   const title = decrypt({
     ciphertext: note.title_encrypted,
@@ -195,31 +200,38 @@ export const createNote = async (userId, { title, content }, clientIp, userAgent
  * Actualizar una nota existente con verificación IDOR
  */
 export const updateNote = async (userId, noteId, { title, content }, clientIp, userAgent) => {
-  const noteCheck = await query('SELECT * FROM notes WHERE id = $1', [noteId]);
+  // 1. Consulta filtrada estrictamente por id y owner_id (Mitigación IDOR A01:2025)
+  const noteCheck = await query(
+    'SELECT * FROM notes WHERE id = $1 AND owner_id = $2',
+    [noteId, userId]
+  );
 
+  // Si rowCount === 0 (la nota no existe o pertenece a otro usuario)
   if (noteCheck.rowCount === 0) {
-    const error = new Error('Nota no encontrada');
-    error.statusCode = 404;
-    throw error;
-  }
+    const crossCheck = await query('SELECT owner_id FROM notes WHERE id = $1', [noteId]);
+    const isOtherUserNote = crossCheck.rowCount > 0;
 
-  const existingNote = noteCheck.rows[0];
-
-  // Verificación estricta de propiedad
-  if (existingNote.owner_id !== userId) {
     await logSecurityEvent({
       userId,
       eventType: 'IDOR_ATTEMPT',
       severity: 'CRITICAL',
       ipAddress: clientIp,
       userAgent,
-      details: { attemptedNoteId: noteId, actualOwnerId: existingNote.owner_id, action: 'UPDATE' }
+      details: {
+        attemptedNoteId: noteId,
+        action: 'UPDATE',
+        actualOwnerId: isOtherUserNote ? crossCheck.rows[0].owner_id : null,
+        confirmedCrossUserAccess: isOtherUserNote,
+        reason: isOtherUserNote ? 'CROSS_USER_NOTE_ACCESS' : 'UNOWNED_OR_NONEXISTENT_NOTE'
+      }
     });
 
     const error = new Error('Nota no encontrada');
     error.statusCode = 404;
     throw error;
   }
+
+  const existingNote = noteCheck.rows[0];
 
   // Preparar valores cifrados nuevos o mantener existentes
   let newTitleEnc = existingNote.title_encrypted;
@@ -301,33 +313,36 @@ export const updateNote = async (userId, noteId, { title, content }, clientIp, u
  * Eliminar una nota con verificación IDOR
  */
 export const deleteNote = async (userId, noteId, clientIp, userAgent) => {
-  const noteCheck = await query('SELECT * FROM notes WHERE id = $1', [noteId]);
+  // 1. Eliminar nota filtrada estrictamente por id y owner_id (Mitigación IDOR A01:2025)
+  const deleteResult = await query(
+    'DELETE FROM notes WHERE id = $1 AND owner_id = $2 RETURNING id',
+    [noteId, userId]
+  );
 
-  if (noteCheck.rowCount === 0) {
-    const error = new Error('Nota no encontrada');
-    error.statusCode = 404;
-    throw error;
-  }
+  // Si rowCount === 0 (la nota no existe o pertenece a otro usuario)
+  if (deleteResult.rowCount === 0) {
+    const crossCheck = await query('SELECT owner_id FROM notes WHERE id = $1', [noteId]);
+    const isOtherUserNote = crossCheck.rowCount > 0;
 
-  const existingNote = noteCheck.rows[0];
-
-  // Control estricto de propiedad
-  if (existingNote.owner_id !== userId) {
     await logSecurityEvent({
       userId,
       eventType: 'IDOR_ATTEMPT',
       severity: 'CRITICAL',
       ipAddress: clientIp,
       userAgent,
-      details: { attemptedNoteId: noteId, actualOwnerId: existingNote.owner_id, action: 'DELETE' }
+      details: {
+        attemptedNoteId: noteId,
+        action: 'DELETE',
+        actualOwnerId: isOtherUserNote ? crossCheck.rows[0].owner_id : null,
+        confirmedCrossUserAccess: isOtherUserNote,
+        reason: isOtherUserNote ? 'CROSS_USER_NOTE_ACCESS' : 'UNOWNED_OR_NONEXISTENT_NOTE'
+      }
     });
 
     const error = new Error('Nota no encontrada');
     error.statusCode = 404;
     throw error;
   }
-
-  await query('DELETE FROM notes WHERE id = $1 AND owner_id = $2', [noteId, userId]);
 
   await logSecurityEvent({
     userId,

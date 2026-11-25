@@ -94,21 +94,33 @@ export const changeUserRole = async (adminUserId, targetUserId, newRole, clientI
 };
 
 /**
- * Consultar los últimos 100 eventos de seguridad de la bitácora forense
+ * Consultar los eventos de seguridad de la bitácora forense (con soporte de filtro opcional)
  */
-export const getSecurityLogs = async (limit = 100) => {
+export const getSecurityLogs = async (limit = 100, eventType = null) => {
   const safeLimit = Math.min(Math.max(Number(limit) || 100, 1), 200);
+  const conditions = [];
+  const params = [];
+
+  // Filtro opcional por tipo de evento (ej. 'IDOR_ATTEMPT')
+  if (eventType && typeof eventType === 'string' && eventType !== 'ALL') {
+    params.push(eventType.trim());
+    conditions.push(`s.event_type = $${params.length}`);
+  }
+
+  params.push(safeLimit);
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
   const sql = `
     SELECT s.id, s.user_id, s.event_type, s.severity, s.ip_address, s.user_agent, s.details, s.created_at,
            u.email AS user_email
     FROM security_logs s
     LEFT JOIN users u ON s.user_id = u.id
+    ${whereClause}
     ORDER BY s.created_at DESC
-    LIMIT $1
+    LIMIT $${params.length}
   `;
 
-  const result = await query(sql, [safeLimit]);
+  const result = await query(sql, params);
 
   return result.rows.map((log) => ({
     id: log.id,
