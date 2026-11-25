@@ -22,7 +22,7 @@ export const configureHelmet = () => {
         styleSrc: ["'self'", "'unsafe-inline'"], // Permite estilos en línea del SPA (Vite / Tailwind)
         imgSrc: ["'self'", 'data:', 'blob:'],
         fontSrc: ["'self'"],
-        connectSrc: ["'self'", env.CORS_ORIGIN],
+        connectSrc: ["'self'", env.CORS_ORIGIN, 'https://*.onrender.com'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
         formAction: ["'self'"],
@@ -65,15 +65,28 @@ export const configureHelmet = () => {
  * Permite únicamente el frontend legítimo con credenciales autorizadas.
  */
 export const configureCors = () => {
-  const allowedOrigins = [env.CORS_ORIGIN];
+  const allowedOrigins = [
+    env.CORS_ORIGIN,
+    'http://localhost:5173',
+    'http://localhost:4000',
+    process.env.RENDER_EXTERNAL_URL
+  ].filter(Boolean);
 
   return cors({
     origin: (origin, callback) => {
-      // Permitir peticiones sin origen (como clientes móviles o server-to-server en desarrollo)
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Permitir peticiones sin origen (como navegación directa del navegador, curl, server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Permitir orígenes explícitos configurados o dominios de despliegue en Render
+      const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.onrender.com');
+
+      if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new Error(`Acceso CORS bloqueado por política de seguridad: origen no autorizado (${origin})`));
+        // En lugar de pasar un Error que cause 500 en Express, pasar false para denegar CORS limpiamente
+        callback(null, false);
       }
     },
     credentials: true, // Requerido para envío y recepción de cookies HttpOnly
