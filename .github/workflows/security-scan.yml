@@ -22,26 +22,32 @@ jobs:
       issues: write
 
     steps:
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+
       - name: Despertar la app en Render (Wake-up Ping)
         run: |
           echo "Despertando el servicio en Render por si está en modo reposo..."
           curl -s -i "${{ github.event.inputs.target_url }}/health" || true
           sleep 10
 
-      - name: Ejecutar Contenedor Docker de OWASP ZAP en la Nube
-        uses: zaproxy/action-baseline@v0.12.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target: ${{ github.event.inputs.target_url }}
-          allow_issue_writing: false
-          fail_action: false
+      - name: Ejecutar Contenedor Docker de OWASP ZAP (Cloud DAST)
+        run: |
+          echo "Ejecutando contenedor oficial ghcr.io/zaproxy/zaproxy:stable en la nube..."
+          mkdir -p zap-reports
+          docker run --rm -v $(pwd)/zap-reports:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+            -t "${{ github.event.inputs.target_url }}" \
+            -r report_html.html \
+            -w report_md.md \
+            -J report_json.json || true
+          echo "Escaneo de OWASP ZAP finalizado."
 
       - name: Publicar Reporte Forense en Resumen de GitHub
         if: always()
         run: |
-          if [ -f report_md.md ]; then
+          if [ -f zap-reports/report_md.md ]; then
             echo "### 🛡️ Reporte Completo de Ciberseguridad OWASP ZAP" >> $GITHUB_STEP_SUMMARY
-            cat report_md.md >> $GITHUB_STEP_SUMMARY
+            cat zap-reports/report_md.md >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Guardar Reporte HTML y JSON como Artefactos
@@ -49,7 +55,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: reporte-owasp-zap-dast
-          path: |
-            report_html.html
-            report_md.md
-            report_json.json
+          path: zap-reports/*
