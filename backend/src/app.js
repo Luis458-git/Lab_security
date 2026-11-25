@@ -1,7 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import env from './config/env.js';
 import { configureHelmet, configureCors } from './security/helmet.security.js';
 import { apiRateLimiter } from './security/rateLimit.security.js';
@@ -40,19 +40,17 @@ app.use('/api', apiRateLimiter);
 // Enrutador de la aplicación (/health y /api/v1/*)
 app.use(routes);
 
-// Servir frontend compilado en producción y soporte para SPA routing
-if (env.NODE_ENV === 'production') {
-  const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
-  app.use(express.static(frontendDistPath));
+// Servir frontend compilado de React (frontend/dist)
+const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+app.use(express.static(frontendDistPath));
 
-  app.get('*', (req, res, next) => {
-    // Si la ruta inicia con /api o /health, no enviar index.html
-    if (req.originalUrl.startsWith('/api') || req.originalUrl === '/health') {
-      return next();
-    }
-    res.sendFile(path.join(frontendDistPath, 'index.html'));
-  });
-}
+// Cualquier ruta que NO empiece por /api ni /health devuelve index.html (React Router)
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/health') {
+    return next();
+  }
+  res.sendFile(path.join(frontendDistPath, 'index.html'));
+});
 
 // Manejador de rutas no encontradas (404)
 app.use((req, res) => {
