@@ -6,9 +6,9 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [authError, setAuthError] = useState(null);
 
-  const checkAuth = useCallback(async () => {
+  // Verificación de sesión segura al iniciar la aplicación (HttpOnly Cookie)
+  const verifySession = useCallback(async () => {
     try {
       setLoading(true);
       const res = await authService.getMe();
@@ -25,50 +25,38 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    verifySession();
+  }, [verifySession]);
 
   const login = async (credentials) => {
-    setAuthError(null);
-    try {
-      const res = await authService.login(credentials);
-      setUser(res.user);
-      return res.user;
-    } catch (err) {
-      setAuthError(err.message);
-      throw err;
-    }
+    const res = await authService.login(credentials);
+    setUser(res.user);
+    return res.user;
   };
 
   const register = async (userData) => {
-    setAuthError(null);
-    try {
-      const res = await authService.register(userData);
-      return res;
-    } catch (err) {
-      setAuthError(err.message);
-      throw err;
-    }
+    const res = await authService.register(userData);
+    return res;
   };
 
   const logout = async () => {
     try {
       await authService.logout();
     } catch (err) {
-      console.error('Error durante cierre de sesión:', err);
+      console.warn('Advertencia durante logout:', err);
     } finally {
+      // Limpieza total del estado de sesión en memoria
       setUser(null);
     }
   };
 
   const refreshUser = async () => {
-    await checkAuth();
+    await verifySession();
   };
 
   const value = {
     user,
     loading,
-    authError,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     login,

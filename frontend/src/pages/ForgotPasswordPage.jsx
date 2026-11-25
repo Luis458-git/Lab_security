@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import authService from '../services/auth.service.js';
 import PasswordStrength from '../components/security/PasswordStrength.jsx';
+import { KeyRound, Mail, Lock, Copy, Check, ArrowLeft, Loader2, AlertOctagon, CheckCircle2 } from 'lucide-react';
 
 export const ForgotPasswordPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Si viene ?token=... en la URL
   const initialToken = searchParams.get('token') || '';
 
   const [step, setStep] = useState(initialToken ? 2 : 1);
@@ -18,8 +18,9 @@ export const ForgotPasswordPage = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [devTokenNotice, setDevTokenNotice] = useState('');
+  const [copied, setCopied] = useState(false);
 
-  // Paso 1: Solicitar enlace/token
+  // Paso 1: Solicitar token
   const handleRequestReset = async (e) => {
     e.preventDefault();
     setError('');
@@ -35,20 +36,20 @@ export const ForgotPasswordPage = () => {
       }
       setStep(2);
     } catch (err) {
-      setError(err.message || 'Error al solicitar restablecimiento');
+      setError(err.message || 'Error al procesar la solicitud');
     } finally {
       setLoading(false);
     }
   };
 
-  // Paso 2: Consumir token y actualizar contraseña
+  // Paso 2: Aplicar token y actualizar contraseña
   const handleConfirmReset = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
     if (newPassword.length < 12) {
-      setError('La nueva contraseña debe tener al menos 12 caracteres y cumplir la política de seguridad');
+      setError('La nueva contraseña debe tener al menos 12 caracteres cumpliendo la política de seguridad');
       return;
     }
 
@@ -64,138 +65,181 @@ export const ForgotPasswordPage = () => {
         navigate('/login');
       }, 2000);
     } catch (err) {
-      setError(err.message || 'Error al restablecer contraseña');
+      setError(err.message || 'Error al restablecer la contraseña');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCopyDevToken = () => {
+    navigator.clipboard.writeText(devTokenNotice);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-xl">
+      <div className="max-w-md w-full space-y-6 bg-vault-card border border-vault-border p-8 rounded-2xl shadow-xl transition-surface">
         <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-cyan-500/10 border border-cyan-500/30 rounded-xl flex items-center justify-center text-cyan-400 mb-4">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-            </svg>
+          <div className="mx-auto w-12 h-12 bg-vault-surface border border-vault-border rounded-xl flex items-center justify-center text-vault-emerald mb-3">
+            <KeyRound className="w-6 h-6 text-vault-emerald" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">
-            {step === 1 ? 'Recuperar Contraseña' : 'Nueva Contraseña Maestra'}
+          <h2 className="text-2xl font-bold tracking-tight text-white font-sans">
+            {step === 1 ? 'Recuperación Segura' : 'Restablecer Contraseña'}
           </h2>
-          <p className="mt-1 text-sm text-slate-400">
-            Token de un solo uso criptográfico con expiración de 15 minutos (SHA-256)
+          <p className="mt-1 text-xs text-gray-400">
+            Token efímero de un solo uso hasheado con SHA-256 (Expiración: 15 min - RF-06)
           </p>
         </div>
 
         {error && (
-          <div className="p-4 bg-rose-950/40 border border-rose-900/60 rounded-xl text-rose-300 text-sm">
-            {error}
+          <div className="p-3.5 bg-rose-950/40 border border-vault-red/60 rounded-xl text-vault-red text-xs flex items-center gap-2">
+            <AlertOctagon className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-4 bg-emerald-950/40 border border-emerald-900/60 rounded-xl text-emerald-300 text-sm font-medium">
-            {success}
+          <div className="p-3.5 bg-emerald-950/40 border border-emerald-900/60 rounded-xl text-vault-emerald text-xs font-medium flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>{success}</span>
           </div>
         )}
 
+        {/* Cuadro destacado para copiar el token de desarrollo/laboratorio */}
         {devTokenNotice && (
-          <div className="p-3 bg-cyan-950/40 border border-cyan-800/60 rounded-xl text-cyan-300 text-xs font-mono break-all">
-            <span className="font-bold block text-cyan-200 mb-1">🔑 Token de recuperación (Entorno Laboratorio):</span>
-            {devTokenNotice}
+          <div className="p-3.5 bg-vault-surface border border-vault-emerald/50 rounded-xl text-xs space-y-2 animate-fade-in">
+            <div className="flex items-center justify-between text-vault-emerald font-semibold">
+              <span>Token de laboratorio detectado:</span>
+              <button
+                type="button"
+                onClick={handleCopyDevToken}
+                className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-emerald-950 hover:bg-emerald-900 text-vault-emerald border border-emerald-800 transition-colors"
+              >
+                {copied ? <Check className="w-3 h-3 text-vault-emerald" /> : <Copy className="w-3 h-3" />}
+                <span>{copied ? 'Copiado' : 'Copiar Token'}</span>
+              </button>
+            </div>
+            <div className="bg-vault-bg p-2 rounded border border-vault-border text-[11px] font-mono text-gray-300 break-all select-all">
+              {devTokenNotice}
+            </div>
           </div>
         )}
 
         {step === 1 ? (
           <form className="space-y-4" onSubmit={handleRequestReset}>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-gray-300 mb-1">
                 Correo Electrónico Registrado
               </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu-correo@ejemplo.com"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 text-sm"
-                disabled={loading}
-              />
+              <div className="relative">
+                <Mail className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu-correo@ejemplo.com"
+                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
+                  disabled={loading}
+                />
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-cyan-500/20"
+              className="w-full py-2.5 px-4 rounded-lg bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-emerald-950/40 flex items-center justify-center gap-2"
             >
-              {loading ? 'Generando Token Seguro...' : 'Solicitar Enlace de Restablecimiento'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Generando Token Criptográfico...</span>
+                </>
+              ) : (
+                <span>Solicitar Token de Recuperación</span>
+              )}
             </button>
 
             <div className="pt-2 text-center">
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors"
+                className="text-xs text-gray-400 hover:text-vault-emerald transition-colors"
               >
-                ¿Ya tienes un token de 64 caracteres? Ingresar directamente →
+                ¿Ya cuentas con el token de 64 caracteres? Continuar al Paso 2 →
               </button>
             </div>
           </form>
         ) : (
           <form className="space-y-4" onSubmit={handleConfirmReset}>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Token de Recuperación (64 caracteres hexadecimales)
+              <label className="block text-xs font-medium text-gray-300 mb-1">
+                Token de Recuperación (64 caracteres hex)
               </label>
-              <input
-                type="text"
-                required
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                placeholder="64 caracteres hex..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 text-xs font-mono"
-                disabled={loading}
-              />
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
+                <input
+                  type="text"
+                  required
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  placeholder="64 caracteres hexadecimales..."
+                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-xs font-mono transition-colors"
+                  disabled={loading}
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Nueva Contraseña
+              <label className="block text-xs font-medium text-gray-300 mb-1">
+                Nueva Contraseña Maestra
               </label>
-              <input
-                type="password"
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Mínimo 12 caracteres complejos"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 text-sm"
-                disabled={loading}
-              />
+              <div className="relative">
+                <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
+                <input
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Mínimo 12 caracteres complejos"
+                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
+                  disabled={loading}
+                />
+              </div>
               <PasswordStrength password={newPassword} />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-cyan-500/20"
+              className="w-full py-2.5 px-4 rounded-lg bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-emerald-950/40 flex items-center justify-center gap-2"
             >
-              {loading ? 'Validando Token y Hasheando...' : 'Actualizar Contraseña'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Validando Token y Hasheando...</span>
+                </>
+              ) : (
+                <span>Actualizar Contraseña y Consumir Token</span>
+              )}
             </button>
 
             <div className="pt-2 text-center">
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-xs text-slate-400 hover:text-cyan-400 transition-colors"
+                className="text-xs text-gray-400 hover:text-vault-emerald transition-colors flex items-center justify-center gap-1 mx-auto"
               >
-                ← Volver a solicitar token
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Volver al Paso 1</span>
               </button>
             </div>
           </form>
         )}
 
-        <div className="text-center text-xs text-slate-500 pt-2 border-t border-slate-800/80">
-          <Link to="/login" className="text-cyan-400 hover:underline font-medium">
+        <div className="text-center text-xs text-gray-500 pt-3 border-t border-vault-border">
+          <Link to="/login" className="text-vault-emerald hover:underline font-medium">
             Volver al inicio de sesión
           </Link>
         </div>

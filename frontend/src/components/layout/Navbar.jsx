@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { Shield, Lock, FileText, User, LogOut, ShieldAlert } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -15,99 +16,101 @@ export const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <header className="sticky top-0 z-40 bg-vault-card/90 backdrop-blur-md border-b border-vault-border transition-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand / Logo */}
         <Link to="/" className="flex items-center space-x-3 group">
-          <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:border-cyan-400 transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+          <div className="w-9 h-9 rounded-lg bg-vault-surface border border-vault-border flex items-center justify-center text-vault-emerald group-hover:border-vault-emerald transition-colors">
+            <Lock className="w-5 h-5 text-vault-emerald" />
           </div>
-          <div>
-            <span className="text-lg font-bold tracking-tight text-white flex items-center space-x-1.5">
-              <span>SecureVault</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">
-                AES-256-GCM
-              </span>
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-bold tracking-tight text-white flex items-center gap-1.5 font-sans">
+              SecureVault
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/60 text-vault-emerald border border-emerald-800/40 font-mono font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-vault-emerald animate-pulse"></span>
+              AES-256-GCM • TLS
             </span>
           </div>
         </Link>
 
-        {/* Navigation Links */}
-        <nav className="flex items-center space-x-2 sm:space-x-4">
+        {/* Navigation Actions */}
+        <nav className="flex items-center space-x-2 sm:space-x-3">
           {isAuthenticated ? (
             <>
               <Link
                 to="/vault"
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                   isActive('/vault')
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'bg-vault-surface text-vault-emerald border border-vault-emerald/40'
+                    : 'text-gray-300 hover:text-white hover:bg-vault-surface/60'
                 }`}
               >
-                Mi Bóveda
+                <FileText className="w-4 h-4" />
+                <span>Bóveda</span>
               </Link>
 
               <Link
                 to="/profile"
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                   isActive('/profile')
-                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'bg-vault-surface text-vault-emerald border border-vault-emerald/40'
+                    : 'text-gray-300 hover:text-white hover:bg-vault-surface/60'
                 }`}
               >
-                Perfil
+                <User className="w-4 h-4" />
+                <span>Perfil</span>
               </Link>
 
               {isAdmin && (
                 <Link
                   to="/admin"
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                     isActive('/admin')
-                      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30'
+                      ? 'bg-purple-950/60 text-purple-300 border border-purple-700/60'
                       : 'text-purple-300 hover:text-purple-200 hover:bg-purple-950/30'
                   }`}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+                  <ShieldAlert className="w-4 h-4 text-purple-400" />
                   <span>Admin</span>
                 </Link>
               )}
 
-              <div className="h-5 w-px bg-slate-800 mx-1 hidden sm:block"></div>
+              <div className="h-5 w-px bg-vault-border mx-1 hidden sm:block"></div>
 
-              <div className="hidden sm:flex flex-col items-end text-xs">
-                <span className="text-slate-200 font-medium truncate max-w-[130px]">
+              <div className="hidden md:flex flex-col items-end text-xs pr-1">
+                <span className="text-gray-200 font-medium truncate max-w-[130px]">
                   {user.fullName || user.email}
                 </span>
-                <span className="text-slate-500 text-[10px] font-mono capitalize">
+                <span className="text-gray-500 text-[10px] font-mono capitalize">
                   {user.role}
                 </span>
               </div>
 
               <button
                 onClick={handleLogout}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-900/30 transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-gray-400 hover:text-vault-red hover:bg-rose-950/20 border border-transparent hover:border-rose-900/40 transition-colors"
                 title="Cerrar sesión de forma segura"
               >
-                Salir
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Cerrar Sesión</span>
               </button>
             </>
           ) : (
             <>
               <Link
                 to="/login"
-                className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                   isActive('/login')
-                    ? 'text-cyan-400 bg-slate-800'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'text-vault-emerald bg-vault-surface'
+                    : 'text-gray-300 hover:text-white'
                 }`}
               >
                 Iniciar Sesión
               </Link>
               <Link
                 to="/register"
-                className="px-3.5 py-1.5 rounded-lg text-sm font-medium bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold shadow-sm shadow-cyan-500/20 transition-colors"
+                className="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-vault-emerald hover:bg-emerald-400 text-vault-bg transition-colors shadow-sm shadow-emerald-900/30"
               >
                 Crear Bóveda
               </Link>

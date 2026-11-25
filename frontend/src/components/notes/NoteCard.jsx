@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Lock, Edit2, Trash2, Calendar, ShieldCheck } from 'lucide-react';
 
 export const NoteCard = ({ note, onEdit, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (window.confirm('¿Estás seguro de eliminar permanentemente esta nota de tu bóveda?')) {
+    if (window.confirm('¿Confirmas la eliminación permanente de esta nota cifrada de la bóveda?')) {
       setIsDeleting(true);
       try {
         await onDelete(note.id);
@@ -14,7 +15,7 @@ export const NoteCard = ({ note, onEdit, onDelete }) => {
     }
   };
 
-  const formattedDate = new Date(note.createdAt).toLocaleDateString(undefined, {
+  const formattedDate = new Date(note.updatedAt || note.createdAt).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -23,44 +24,49 @@ export const NoteCard = ({ note, onEdit, onDelete }) => {
   });
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all shadow-sm hover:shadow-cyan-950/20 flex flex-col justify-between group">
+    <div className="bg-vault-card border border-vault-border rounded-xl p-5 hover:border-vault-borderHover transition-surface flex flex-col justify-between group shadow-sm hover:shadow-emerald-950/20">
       <div>
         {/* Header of Note Card */}
         <div className="flex items-start justify-between gap-3 mb-2.5">
-          <h3 className="font-semibold text-slate-100 text-base line-clamp-1 group-hover:text-cyan-300 transition-colors">
+          <h3 className="font-semibold text-white text-base line-clamp-1 group-hover:text-vault-emerald transition-colors font-sans">
             {note.title}
           </h3>
-          <span className="shrink-0 inline-flex items-center space-x-1 text-[10px] px-2 py-0.5 rounded bg-cyan-950/50 text-cyan-400 border border-cyan-800/40 font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-            <span>AES-256-GCM</span>
+          <span className="shrink-0 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/60 text-vault-emerald border border-emerald-800/40 font-mono font-medium">
+            <Lock className="w-2.5 h-2.5 text-vault-emerald" />
+            <span>Cifrado AES-256-GCM</span>
           </span>
         </div>
 
-        {/* Content body */}
-        <p className="text-slate-300 text-sm whitespace-pre-wrap break-words line-clamp-4 font-sans leading-relaxed">
+        {/* Content body rendered strictly as raw text node (OWASP A05: XSS Immune) */}
+        <p className="text-gray-300 text-sm whitespace-pre-wrap break-words line-clamp-4 font-sans leading-relaxed select-text">
           {note.content}
         </p>
       </div>
 
       {/* Footer & Actions */}
-      <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
-        <span className="font-mono text-[11px]">{formattedDate}</span>
+      <div className="mt-5 pt-3 border-t border-vault-border/80 flex items-center justify-between text-xs text-gray-500">
+        <span className="font-mono text-[11px] flex items-center gap-1.5 text-gray-400">
+          <Calendar className="w-3 h-3 text-gray-500" />
+          {formattedDate}
+        </span>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5">
           <button
             onClick={() => onEdit(note)}
-            className="px-2.5 py-1 rounded hover:bg-slate-800 text-slate-400 hover:text-cyan-400 transition-colors font-medium"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-vault-surface text-gray-400 hover:text-vault-emerald transition-colors font-medium text-xs"
             title="Editar contenido de la nota"
           >
-            Editar
+            <Edit2 className="w-3.5 h-3.5" />
+            <span>Editar</span>
           </button>
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="px-2.5 py-1 rounded hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 transition-colors font-medium disabled:opacity-50"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-rose-950/30 text-gray-400 hover:text-vault-red transition-colors font-medium text-xs disabled:opacity-50"
             title="Eliminar de forma permanente"
           >
-            {isDeleting ? 'Borrando...' : 'Borrar'}
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>{isDeleting ? 'Borrando...' : 'Borrar'}</span>
           </button>
         </div>
       </div>

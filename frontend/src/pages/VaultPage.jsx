@@ -3,6 +3,7 @@ import notesService from '../services/notes.service.js';
 import QuotaBar from '../components/notes/QuotaBar.jsx';
 import NoteCard from '../components/notes/NoteCard.jsx';
 import NoteModal from '../components/notes/NoteModal.jsx';
+import { Plus, Search, FolderLock, Lock, Shield, X, Loader2, AlertOctagon } from 'lucide-react';
 
 export const VaultPage = () => {
   const [notes, setNotes] = useState([]);
@@ -24,7 +25,7 @@ export const VaultPage = () => {
       setCount(data.count || 0);
       setMaxQuota(data.quotaMax || 20);
     } catch (err) {
-      setError(err.message || 'Error al cargar las notas de la bóveda');
+      setError(err.message || 'Error al descifrar y cargar las notas de la bóveda');
     } finally {
       setLoading(false);
     }
@@ -36,7 +37,7 @@ export const VaultPage = () => {
 
   const handleOpenCreate = () => {
     if (count >= maxQuota) {
-      alert(`Has alcanzado la cuota máxima permitida de ${maxQuota} notas. Elimina notas antiguas para liberar espacio.`);
+      alert(`Has alcanzado la cuota de negocio de ${maxQuota} notas (A06: Insecure Design). Elimina notas antiguas para crear una nueva.`);
       return;
     }
     setSelectedNote(null);
@@ -62,10 +63,11 @@ export const VaultPage = () => {
       await notesService.deleteNote(noteId);
       await fetchNotes();
     } catch (err) {
-      alert(err.message || 'Error al eliminar la nota');
+      alert(err.message || 'Error al eliminar la nota de la bóveda');
     }
   };
 
+  // Filtrado local rápido en memoria (inmune a inyección SQL)
   const filteredNotes = notes.filter((n) => {
     const q = search.toLowerCase();
     return n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q);
@@ -73,67 +75,65 @@ export const VaultPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Header and Controls */}
+      {/* Header and Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center space-x-2">
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5 font-sans">
+            <FolderLock className="w-6 h-6 text-vault-emerald" />
             <span>Bóveda de Notas Privadas</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 font-mono">
-              E2E In-Memory Decrypt
-            </span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Cada contenido se cifra con claves simétricas derivadas y autenticación GCM (OWASP A04)
+          <p className="text-xs text-gray-400 mt-1">
+            Datos confidenciales protegidos con Envelope Encryption (AES-256-GCM) en reposo (RF-04)
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
           disabled={count >= maxQuota}
-          className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold text-sm transition-colors shadow-sm shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors shadow-sm shadow-emerald-950/40 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-lg leading-none">+</span>
+          <Plus className="w-4 h-4" />
           <span>Nueva Nota Cifrada</span>
         </button>
       </div>
 
-      {/* Quota Bar */}
+      {/* Quota Bar (Límite de negocio A06) */}
       <QuotaBar count={count} max={maxQuota} />
 
-      {/* Search and Filters */}
-      <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2">
-        <svg className="w-4 h-4 text-slate-500 mr-2.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+      {/* Search Bar */}
+      <div className="flex items-center bg-vault-card border border-vault-border rounded-xl px-3.5 py-2.5 transition-surface focus-within:border-vault-emerald">
+        <Search className="w-4 h-4 text-gray-500 mr-2.5 shrink-0" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar dentro del texto descifrado en memoria..."
-          className="bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none w-full"
+          placeholder="Buscar dentro de títulos y notas descifradas en memoria..."
+          className="bg-transparent text-sm text-gray-100 placeholder-gray-500 focus:outline-none w-full"
         />
         {search && (
           <button
             onClick={() => setSearch('')}
-            className="text-xs text-slate-500 hover:text-white px-1"
+            className="text-gray-400 hover:text-white p-1 rounded-md"
+            title="Limpiar búsqueda"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Error state */}
+      {/* Error message */}
       {error && (
-        <div className="p-4 bg-rose-950/40 border border-rose-900/50 rounded-xl text-rose-300 text-sm">
-          {error}
+        <div className="p-4 bg-rose-950/40 border border-vault-red/60 rounded-xl text-vault-red text-xs flex items-center gap-2">
+          <AlertOctagon className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
-      {/* Loading state */}
+      {/* Loading State */}
       {loading && (
         <div className="py-20 flex flex-col items-center justify-center space-y-3">
-          <div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
-          <p className="text-xs text-slate-500 font-mono">Descifrando notas con AES-256-GCM...</p>
+          <Loader2 className="w-8 h-8 text-vault-emerald animate-spin" />
+          <p className="text-xs text-gray-400 font-mono">Descifrando notas en memoria con clave simétrica...</p>
         </div>
       )}
 
@@ -141,26 +141,24 @@ export const VaultPage = () => {
       {!loading && (
         <>
           {filteredNotes.length === 0 ? (
-            <div className="text-center py-20 bg-slate-900/40 border border-slate-800/60 rounded-2xl p-8">
-              <div className="w-12 h-12 mx-auto rounded-full bg-slate-800/80 flex items-center justify-center text-slate-500 mb-3">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
+            <div className="text-center py-20 bg-vault-card/40 border border-vault-border/80 rounded-2xl p-8">
+              <div className="w-12 h-12 mx-auto rounded-full bg-vault-surface flex items-center justify-center text-gray-500 mb-3 border border-vault-border">
+                <Lock className="w-6 h-6 text-gray-500" />
               </div>
-              <h3 className="text-base font-semibold text-slate-300">
-                {search ? 'No se encontraron notas que coincidan con la búsqueda' : 'Tu bóveda está vacía'}
+              <h3 className="text-base font-semibold text-gray-200">
+                {search ? 'Sin resultados para la búsqueda' : 'Tu bóveda se encuentra vacía'}
               </h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+              <p className="text-xs text-gray-500 max-w-sm mx-auto mt-1">
                 {search
-                  ? 'Intenta con otro término de búsqueda.'
-                  : 'Crea tu primera nota confidencial protegida por cifrado simétrico en reposo.'}
+                  ? 'Intenta con otros términos clave.'
+                  : 'Crea tu primera nota confidencial. Será cifrada de forma atómica antes de ser persistida.'}
               </p>
               {!search && (
                 <button
                   onClick={handleOpenCreate}
-                  className="mt-4 px-4 py-2 rounded-lg bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 text-xs font-semibold hover:bg-cyan-600/30 transition-colors"
+                  className="mt-4 px-4 py-2 rounded-lg bg-vault-surface hover:bg-vault-card text-vault-emerald border border-vault-emerald/30 text-xs font-semibold transition-colors"
                 >
-                  + Crear primera nota
+                  + Cifrar mi primera nota
                 </button>
               )}
             </div>
@@ -179,7 +177,7 @@ export const VaultPage = () => {
         </>
       )}
 
-      {/* Note Create/Edit Modal */}
+      {/* Note Modal */}
       <NoteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

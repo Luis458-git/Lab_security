@@ -11,7 +11,7 @@ if (process.env.SESSION_SECRET) {
 }
 
 const envSchema = z.object({
-  PORT: z.coerce.number().int().positive().default(3000),
+  PORT: z.coerce.number().int().positive().default(4000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   DATABASE_URL: z.string().url({ message: 'DATABASE_URL debe ser una URL de PostgreSQL válida' }),
   DATA_ENCRYPTION_KEY: z.string().refine((val) => {

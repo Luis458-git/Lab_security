@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import profileService from '../services/profile.service.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { Eye, EyeOff, UserCheck, Shield, Phone, Save, Loader2, AlertOctagon, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 export const ProfilePage = () => {
   const { user, refreshUser } = useAuth();
@@ -8,9 +9,10 @@ export const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [revealedPhone, setRevealedPhone] = useState(null);
+  const [isPhoneRevealed, setIsPhoneRevealed] = useState(false);
   const [revealing, setRevealing] = useState(false);
 
-  // Edit form state
+  // Edit Form
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [updating, setUpdating] = useState(false);
@@ -24,7 +26,7 @@ export const ProfilePage = () => {
       setProfile(res.profile);
       setFullName(res.profile.fullName || '');
     } catch (err) {
-      setError(err.message || 'Error al obtener el perfil');
+      setError(err.message || 'Error al obtener los datos del perfil');
     } finally {
       setLoading(false);
     }
@@ -34,14 +36,25 @@ export const ProfilePage = () => {
     fetchProfile();
   }, []);
 
-  const handleRevealPhone = async () => {
+  const handleToggleRevealPhone = async () => {
+    if (isPhoneRevealed) {
+      setIsPhoneRevealed(false);
+      return;
+    }
+
+    if (revealedPhone) {
+      setIsPhoneRevealed(true);
+      return;
+    }
+
     setRevealing(true);
     setError('');
     try {
       const res = await profileService.revealPhone();
       setRevealedPhone(res.phone);
+      setIsPhoneRevealed(true);
     } catch (err) {
-      setError(err.message || 'Error al descifrar el dato sensible');
+      setError(err.message || 'Error al descifrar dato sensible en el servidor');
     } finally {
       setRevealing(false);
     }
@@ -59,7 +72,7 @@ export const ProfilePage = () => {
       if (phone.trim()) payload.phone = phone.trim();
 
       if (Object.keys(payload).length === 0) {
-        setMessage('No hay cambios pendientes para guardar');
+        setMessage('No se detectaron modificaciones para guardar');
         setUpdating(false);
         return;
       }
@@ -68,7 +81,8 @@ export const ProfilePage = () => {
       setProfile(res.profile);
       setPhone('');
       setRevealedPhone(null);
-      setMessage('Perfil y datos sensibles actualizados y cifrados exitosamente');
+      setIsPhoneRevealed(false);
+      setMessage('Perfil y datos sensibles cifrados y actualizados exitosamente');
       await refreshUser();
     } catch (err) {
       setError(err.message || 'Error al actualizar el perfil');
@@ -79,8 +93,9 @@ export const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="py-20 flex justify-center items-center">
-        <div className="w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
+      <div className="py-20 flex flex-col items-center justify-center space-y-3">
+        <Loader2 className="w-8 h-8 text-vault-emerald animate-spin" />
+        <span className="text-xs text-gray-400 font-mono">Cargando perfil seguro...</span>
       </div>
     );
   }
@@ -88,135 +103,164 @@ export const ProfilePage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Perfil de Seguridad y PII</h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Protección de Información Personal Identificable mediante enmascaramiento y cifrado AES-256-GCM (RF-05)
+        <h1 className="text-2xl font-bold text-white flex items-center gap-2.5 font-sans">
+          <UserCheck className="w-6 h-6 text-vault-emerald" />
+          <span>Perfil de Seguridad y PII</span>
+        </h1>
+        <p className="text-xs text-gray-400 mt-1">
+          Protección de Información Personal Identificable mediante enmascaramiento y cifrado simétrico en reposo (RF-05)
         </p>
       </div>
 
       {error && (
-        <div className="p-4 bg-rose-950/40 border border-rose-900/50 rounded-xl text-rose-300 text-sm">
-          {error}
+        <div className="p-3.5 bg-rose-950/40 border border-vault-red/60 rounded-xl text-vault-red text-xs flex items-center gap-2">
+          <AlertOctagon className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {message && (
-        <div className="p-4 bg-emerald-950/40 border border-emerald-900/50 rounded-xl text-emerald-300 text-sm font-medium">
-          {message}
+        <div className="p-3.5 bg-emerald-950/40 border border-emerald-900/60 rounded-xl text-vault-emerald text-xs font-medium flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>{message}</span>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Card 1: Visualización Segura */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
-          <div className="flex items-center space-x-3 border-b border-slate-800 pb-4">
-            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-lg">
+        {/* Card 1: Visualización y Desvelado Seguro */}
+        <div className="bg-vault-card border border-vault-border rounded-2xl p-6 space-y-5 transition-surface shadow-md">
+          <div className="flex items-center space-x-3.5 border-b border-vault-border pb-4">
+            <div className="w-11 h-11 rounded-xl bg-vault-surface border border-vault-border flex items-center justify-center text-vault-emerald font-bold text-lg font-mono">
               {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'U'}
             </div>
             <div>
               <h2 className="text-base font-semibold text-white">{profile?.fullName}</h2>
-              <span className="text-xs text-slate-400 font-mono">{profile?.email}</span>
+              <span className="text-xs text-gray-400 font-mono">{profile?.email}</span>
             </div>
           </div>
 
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between py-2 border-b border-slate-800/60">
-              <span className="text-slate-400">Rol en el Sistema:</span>
-              <span className="font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-300 capitalize">
+          <div className="space-y-3.5 text-xs">
+            <div className="flex justify-between items-center py-1.5 border-b border-vault-border/60">
+              <span className="text-gray-400">Rol de Acceso (RBAC):</span>
+              <span className="font-mono text-[11px] px-2.5 py-0.5 rounded-full bg-vault-surface text-vault-emerald border border-vault-emerald/30 uppercase font-semibold">
                 {profile?.role}
               </span>
             </div>
 
-            <div className="flex justify-between py-2 border-b border-slate-800/60">
-              <span className="text-slate-400">ID de Usuario (UUID):</span>
-              <span className="font-mono text-slate-500 text-[11px] truncate max-w-[180px]">
+            <div className="flex justify-between items-center py-1.5 border-b border-vault-border/60">
+              <span className="text-gray-400">Identificador UUID:</span>
+              <span className="font-mono text-gray-500 text-[11px] truncate max-w-[190px]">
                 {profile?.id}
               </span>
             </div>
 
-            {/* PII sensible: Teléfono Enmascarado y botón Revelar */}
-            <div className="py-2 space-y-2">
+            {/* PII sensible: Teléfono Enmascarado y botón Revelar / Ocultar */}
+            <div className="py-2 space-y-2.5">
               <div className="flex justify-between items-center">
-                <span className="text-slate-400">Teléfono (Dato Sensible):</span>
+                <span className="text-gray-300 font-medium flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-gray-400" />
+                  Teléfono Confidencial:
+                </span>
                 {profile?.hasPhone ? (
-                  <span className="font-mono text-slate-200 bg-slate-950 px-2 py-1 rounded border border-slate-800">
-                    {revealedPhone ? revealedPhone : profile.phoneMasked || '***-***-XXXX'}
+                  <span className="font-mono text-gray-200 bg-vault-bg px-2.5 py-1 rounded-md border border-vault-border text-xs">
+                    {isPhoneRevealed && revealedPhone ? revealedPhone : profile.phoneMasked || '***-***-XXXX'}
                   </span>
                 ) : (
-                  <span className="text-slate-500 italic">No registrado</span>
+                  <span className="text-gray-500 italic">No registrado</span>
                 )}
               </div>
 
-              {profile?.hasPhone && !revealedPhone && (
+              {profile?.hasPhone && (
                 <div className="pt-1">
                   <button
-                    onClick={handleRevealPhone}
+                    onClick={handleToggleRevealPhone}
                     disabled={revealing}
-                    className="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-medium border border-slate-700 flex items-center justify-center space-x-1.5 transition-colors disabled:opacity-50"
+                    className="w-full py-2 px-3 rounded-lg bg-vault-surface hover:bg-vault-border text-vault-emerald text-xs font-medium border border-vault-border flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                   >
-                    <span>👁️</span>
-                    <span>{revealing ? 'Descifrando desde BD...' : 'Revelar Teléfono Descifrado (Auditoría A09)'}</span>
+                    {revealing ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Descifrando desde base de datos...</span>
+                      </>
+                    ) : isPhoneRevealed ? (
+                      <>
+                        <EyeOff className="w-3.5 h-3.5" />
+                        <span>Ocultar Teléfono (Enmascarar)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Revelar dato descifrado (Auditoría A09)</span>
+                      </>
+                    )}
                   </button>
-                  <p className="text-[10px] text-slate-500 mt-1 italic text-center">
-                    * Esta acción genera un registro inmutable `PHONE_REVEALED` en security_logs.
+                  <p className="text-[10px] text-gray-500 mt-1.5 text-center flex items-center justify-center gap-1">
+                    <ShieldAlert className="w-3 h-3 text-vault-amber" />
+                    <span>Cada revelado genera un registro inmutable PHONE_REVEALED en security_logs</span>
                   </p>
-                </div>
-              )}
-
-              {revealedPhone && (
-                <div className="p-3 bg-cyan-950/30 border border-cyan-800/40 rounded-lg text-[11px] text-cyan-300">
-                  <span className="font-semibold block text-cyan-200">✓ Descifrado exitosamente:</span>
-                  <span className="font-mono text-base font-bold text-white">{revealedPhone}</span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Card 2: Actualización de Datos */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-          <h2 className="text-base font-semibold text-white mb-4 border-b border-slate-800 pb-3">
-            Actualizar Datos del Perfil
-          </h2>
+        {/* Card 2: Actualización de Teléfono y Perfil */}
+        <div className="bg-vault-card border border-vault-border rounded-2xl p-6 transition-surface shadow-md flex flex-col justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-white mb-4 border-b border-vault-border pb-3 flex items-center gap-2 font-sans">
+              <Shield className="w-4 h-4 text-vault-emerald" />
+              <span>Actualizar Datos Sensibles</span>
+            </h2>
 
-          <form onSubmit={handleUpdate} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Nombre Completo</label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Tu nombre completo"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 text-sm"
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Nombre Completo</label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Tu nombre completo"
+                  className="w-full bg-vault-bg border border-vault-border rounded-lg px-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
+                  disabled={updating}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">
+                  Nuevo Teléfono <span className="text-vault-emerald font-normal">(Cifrado con AES-256-GCM)</span>
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+52 55 9999 8888"
+                  className="w-full bg-vault-bg border border-vault-border rounded-lg px-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
+                  disabled={updating}
+                />
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Se computará un nuevo vector de inicialización y se reemplazará la máscara en la base de datos.
+                </p>
+              </div>
+
+              <button
+                type="submit"
                 disabled={updating}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Nuevo Teléfono <span className="text-slate-500 font-normal">(Cifrado con AES-256-GCM)</span>
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+52 55 9999 8888"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 text-sm"
-                disabled={updating}
-              />
-              <p className="text-[10px] text-slate-500 mt-1">
-                Al guardar, se generará una nueva máscara y se reemplazará el ciphertext en reposo.
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={updating}
-              className="w-full py-2.5 px-4 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-cyan-500/20"
-            >
-              {updating ? 'Guardando y Cifrando...' : 'Guardar Cambios'}
-            </button>
-          </form>
+                className="w-full py-2.5 px-4 rounded-lg bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-emerald-950/40 flex items-center justify-center gap-2 mt-2"
+              >
+                {updating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Cifrando y Guardando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>Guardar y Cifrar Datos</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

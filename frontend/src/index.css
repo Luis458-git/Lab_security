@@ -2,28 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --vault-bg: #090d16;
+  --vault-card: #111827;
+  --vault-border: #1f2937;
+  --vault-emerald: #10b981;
+  --vault-amber: #f59e0b;
+  --vault-red: #ef4444;
+}
+
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 min-h-screen antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-color: var(--vault-bg);
+    color: #f3f4f6;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    selection-background-color: #10b981;
+    selection-color: #090d16;
+  }
+
+  ::selection {
+    background-color: #10b981;
+    color: #090d16;
   }
 }
 
-/* Custom scrollbars for dark mode vault */
+/* Custom scrollbars for vault theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #090d16;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
+  background: #1f2937;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #374151;
+}
+
+/* Subtle fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Transition utility classes */
+.transition-surface {
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }

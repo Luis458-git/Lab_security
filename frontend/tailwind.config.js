@@ -9,11 +9,19 @@ export default {
     extend: {
       colors: {
         vault: {
-          dark: '#020617',
-          card: '#0f172a',
-          border: '#1e293b',
-          accent: '#06b6d4'
+          bg: '#090d16',
+          card: '#111827',
+          surface: '#161f33',
+          border: '#1f2937',
+          borderHover: '#374151',
+          emerald: '#10b981',
+          amber: '#f59e0b',
+          red: '#ef4444'
         }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
       }
     },
   },

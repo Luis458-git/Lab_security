@@ -10,6 +10,7 @@ router.use(requireAuth);
 
 router.get('/', profileController.getProfile);
 router.post('/reveal-phone', profileController.revealPhone);
+router.get('/reveal-phone', profileController.revealPhone);
 router.put('/', validateBody(updateProfileSchema), profileController.updateProfile);
 
 export default router;
