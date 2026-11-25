@@ -1,0 +1,42 @@
+{
+  "name": "securevault-backend",
+  "version": "1.0.0",
+  "description": "Bóveda web segura para notas privadas y datos sensibles - Backend API",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "security",
+    "owasp",
+    "aes-256-gcm",
+    "argon2id",
+    "vault",
+    "express"
+  ],
+  "author": "SecureVault Team",
+  "license": "ISC",
+  "dependencies": {
+    "argon2": "^0.41.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.5",
+    "pino": "^9.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "pino-pretty": "^11.0.0",
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

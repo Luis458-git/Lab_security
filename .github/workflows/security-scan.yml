@@ -1,0 +1,33 @@
+name: 🛡️ Escaneo de Seguridad OWASP ZAP (Cloud DAST)
+
+# ==============================================================================
+# Escaneo Dinámico de Seguridad (DAST) con OWASP ZAP
+# Se ejecuta 100% en los servidores de GitHub sin necesidad de instalar Docker en tu PC.
+# ==============================================================================
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'URL pública de tu aplicación en Render'
+        required: true
+        default: 'https://tu-app.onrender.com'
+
+jobs:
+  zap_scan:
+    name: 🔍 OWASP ZAP Container Baseline Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Despertar la app en Render (Wake-up Ping)
+        run: |
+          echo "Despertando el servicio en Render por si está en modo reposo..."
+          curl -s -i "${{ github.event.inputs.target_url }}/health" || true
+          sleep 10
+
+      - name: Ejecutar Contenedor Docker de OWASP ZAP en la Nube
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ github.event.inputs.target_url }}
+          issue_title: 'Reporte de Auditoría de Seguridad OWASP ZAP'
+          fail_action: false

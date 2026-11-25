@@ -1,0 +1,108 @@
+name: SecureVault CI/CD Pipeline
+
+# ==============================================================================
+# PIPELINE DEVSECOPS - SECUREVAULT (OWASP Top 10:2025)
+# Mitigaciones:
+# - A03:2025 - Supply Chain & Software Integrity (npm audit --audit-level=high)
+# - A08:2025 - Software and Data Integrity Failures (Validación y pruebas automatizadas)
+# ==============================================================================
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-audit-and-test:
+    name: 🛡️ Security Audit, Tests & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Código Fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js (v20 LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package.json
+            frontend/package.json
+
+      # ------------------------------------------------------------------------
+      # PASO 1: Instalación Determinista (npm ci)
+      # ------------------------------------------------------------------------
+      - name: Asegurar package-lock.json en Backend
+        run: |
+          if [ ! -f backend/package-lock.json ]; then
+            echo "Generando backend/package-lock.json para instalación determinista..."
+            npm install --package-lock-only --prefix backend
+          fi
+
+      - name: Asegurar package-lock.json en Frontend
+        run: |
+          if [ ! -f frontend/package-lock.json ]; then
+            echo "Generando frontend/package-lock.json para instalación determinista..."
+            npm install --package-lock-only --prefix frontend
+          fi
+
+      - name: Instalar Dependencias de Backend (npm ci)
+        run: npm ci --prefix backend
+
+      - name: Instalar Dependencias de Frontend (npm ci)
+        run: npm ci --prefix frontend
+
+      # ------------------------------------------------------------------------
+      # PASO 2: Auditoría de Seguridad de Dependencias (OWASP A03 / A08)
+      # Falla el pipeline si existen vulnerabilidades de severidad HIGH o CRITICAL
+      # ------------------------------------------------------------------------
+      - name: Auditoría de Seguridad en Dependencias de Backend
+        run: npm audit --audit-level=high --prefix backend
+
+      - name: Auditoría de Seguridad en Dependencias de Frontend
+        run: npm audit --audit-level=high --prefix frontend
+
+      # ------------------------------------------------------------------------
+      # PASO 3: Ejecución de Pruebas Unitarias y Criptográficas (OWASP A04, A07)
+      # ------------------------------------------------------------------------
+      - name: Ejecutar Pruebas Automatizadas de Seguridad (node:test)
+        run: npm test --prefix backend
+
+      # ------------------------------------------------------------------------
+      # PASO 4: Compilación de Verificación del Frontend (Vite)
+      # ------------------------------------------------------------------------
+      - name: Compilar Frontend (React + Vite)
+        run: npm run build --prefix frontend
+
+  deploy:
+    name: 🚀 Continuous Deployment a Render
+    needs: [security-audit-and-test]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Disparar Render Deploy Hook
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "⚠️ [ADVERTENCIA DEVSECOPS] El secreto RENDER_DEPLOY_HOOK_URL no está configurado en GitHub Secrets."
+            echo "Para habilitar el despliegue automático continuo, configure RENDER_DEPLOY_HOOK_URL en el repositorio."
+            exit 0
+          fi
+
+          echo "Disparando webhook seguro de despliegue a Render..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "✅ Solicitud de despliegue aceptada por Render con código HTTP $HTTP_STATUS."
+          else
+            echo "❌ Fallo al disparar el webhook de Render. Código HTTP devuelto: $HTTP_STATUS."
+            exit 1
+          fi
