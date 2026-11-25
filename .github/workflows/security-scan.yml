@@ -17,6 +17,9 @@ jobs:
   zap_scan:
     name: 🔍 OWASP ZAP Container Baseline Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
 
     steps:
       - name: Despertar la app en Render (Wake-up Ping)
@@ -28,6 +31,25 @@ jobs:
       - name: Ejecutar Contenedor Docker de OWASP ZAP en la Nube
         uses: zaproxy/action-baseline@v0.12.0
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           target: ${{ github.event.inputs.target_url }}
-          issue_title: 'Reporte de Auditoría de Seguridad OWASP ZAP'
+          allow_issue_writing: false
           fail_action: false
+
+      - name: Publicar Reporte Forense en Resumen de GitHub
+        if: always()
+        run: |
+          if [ -f report_md.md ]; then
+            echo "### 🛡️ Reporte Completo de Ciberseguridad OWASP ZAP" >> $GITHUB_STEP_SUMMARY
+            cat report_md.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Guardar Reporte HTML y JSON como Artefactos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-owasp-zap-dast
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
