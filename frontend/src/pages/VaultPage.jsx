@@ -74,17 +74,17 @@ export const VaultPage = () => {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14 py-8 sm:py-10 space-y-6">
-      {/* Mobbin Style App Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E5E5E5] animate-slide-up">
+      {/* Header Verde Expensify */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#BBE2CE] animate-slide-up">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-[28%] bg-[#141414] text-white flex items-center justify-center shadow-sm shrink-0">
+          <div className="w-14 h-14 rounded-full bg-[#002E22] text-[#03D47C] flex items-center justify-center shadow-md shrink-0">
             <Lock className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#141414] tracking-tight">
+            <h1 className="font-expensify-serif text-2xl sm:text-3xl font-bold text-[#002E22] tracking-tight">
               Bóveda de Notas Privadas
             </h1>
-            <p className="text-xs sm:text-sm text-[#666666] mt-0.5">
+            <p className="text-xs sm:text-sm text-[#3B6E5C] mt-0.5">
               Envelope Encryption (AES-256-GCM) en reposo • Descifrado bajo demanda en memoria (RF-04)
             </p>
           </div>
@@ -93,9 +93,9 @@ export const VaultPage = () => {
         <button
           onClick={handleOpenCreate}
           disabled={count >= maxQuota}
-          className="btn-editorial inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="btn-expensify inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Nueva Nota Cifrada</span>
         </button>
       </div>
@@ -103,21 +103,21 @@ export const VaultPage = () => {
       {/* Quota Bar */}
       <QuotaBar count={count} max={maxQuota} />
 
-      {/* Mobbin Pill Search & Counter Row */}
+      {/* Pill Search & Counter Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
         <div className="relative flex-1 max-w-md flex items-center">
-          <Search className="w-4 h-4 text-[#878787] absolute left-4" />
+          <Search className="w-4 h-4 text-[#3B6E5C] absolute left-4" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar en títulos y notas descifradas..."
-            className="w-full h-11 pl-10 pr-9 rounded-full bg-[#F4F4F5] border border-transparent focus:border-[#141414] focus:bg-white text-sm text-[#141414] placeholder-[#878787] focus:outline-none transition-all"
+            className="w-full h-11 pl-10 pr-9 rounded-full bg-white border border-[#BBE2CE] focus:border-[#03D47C] text-sm text-[#002E22] placeholder-[#639281] focus:outline-none transition-all shadow-2xs"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3.5 text-[#878787] hover:text-[#141414] cursor-pointer"
+              className="absolute right-3.5 text-[#3B6E5C] hover:text-[#002E22] cursor-pointer"
               title="Limpiar búsqueda"
             >
               <X className="w-4 h-4" />
@@ -125,14 +125,14 @@ export const VaultPage = () => {
           )}
         </div>
 
-        <span className="text-xs sm:text-sm text-[#878787] font-medium">
+        <span className="text-xs sm:text-sm text-[#0B533E] font-bold">
           Mostrando {filteredNotes.length} de {count} notas cifradas
         </span>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#B91C1C] text-xs font-semibold flex items-center gap-2">
+        <div className="p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-2xl text-[#B91C1C] text-xs font-bold flex items-center gap-2">
           <AlertOctagon className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -141,8 +141,8 @@ export const VaultPage = () => {
       {/* Loading */}
       {loading && (
         <div className="py-20 flex flex-col items-center justify-center space-y-3">
-          <Loader2 className="w-7 h-7 text-[#141414] animate-spin" />
-          <p className="text-xs text-[#666666] font-mono">Descifrando notas en memoria con clave simétrica...</p>
+          <Loader2 className="w-8 h-8 text-[#002E22] animate-spin" />
+          <p className="text-xs text-[#3B6E5C] font-mono">Descifrando notas en memoria con clave simétrica...</p>
         </div>
       )}
 
@@ -150,14 +150,14 @@ export const VaultPage = () => {
       {!loading && (
         <>
           {filteredNotes.length === 0 ? (
-            <div className="text-center py-20 bg-[#F7F7F8] border border-[#E5E5E5] rounded-2xl p-8 animate-slide-up">
-              <div className="w-12 h-12 mx-auto rounded-full bg-white flex items-center justify-center text-[#141414] mb-3 border border-[#E5E5E5] shadow-2xs">
-                <FileText className="w-5 h-5" />
+            <div className="text-center py-20 bg-[#DDF2E8] border-2 border-[#BBE2CE] rounded-3xl p-8 animate-slide-up">
+              <div className="w-14 h-14 mx-auto rounded-full bg-[#002E22] flex items-center justify-center text-[#03D47C] mb-3 shadow-md">
+                <FileText className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-[#141414]">
+              <h3 className="font-expensify-serif text-lg font-bold text-[#002E22]">
                 {search ? 'Sin resultados para la búsqueda' : 'Tu bóveda se encuentra vacía'}
               </h3>
-              <p className="text-xs text-[#666666] max-w-sm mx-auto mt-1 leading-relaxed">
+              <p className="text-xs text-[#3B6E5C] max-w-sm mx-auto mt-1 leading-relaxed">
                 {search
                   ? 'Intenta con otros términos clave.'
                   : 'Crea tu primera nota confidencial. Será cifrada con AES-256-GCM antes de ser persistida.'}
@@ -165,7 +165,7 @@ export const VaultPage = () => {
               {!search && (
                 <button
                   onClick={handleOpenCreate}
-                  className="btn-editorial mt-5 px-6 py-2.5 rounded-full text-xs cursor-pointer"
+                  className="btn-expensify mt-5 px-6 py-2.5 rounded-full text-xs cursor-pointer"
                 >
                   + Cifrar mi primera nota
                 </button>
@@ -186,7 +186,6 @@ export const VaultPage = () => {
         </>
       )}
 
-      {/* Modal */}
       <NoteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

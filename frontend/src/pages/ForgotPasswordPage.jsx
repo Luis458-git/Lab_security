@@ -65,22 +65,22 @@ export const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F4F4F5] bg-dot-grid">
-      <div className="max-w-md w-full space-y-6 editorial-panel bg-white p-8 sm:p-10 rounded-2xl animate-slide-up">
-        {/* Step Pill Indicator */}
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-forest-pattern">
+      {/* Modal de Recuperación Estilo Expensify Onboarding */}
+      <div className="max-w-md w-full space-y-6 bg-[#F7FCF9] border-2 border-[#03D47C] p-8 sm:p-10 rounded-3xl shadow-2xl animate-slide-up">
         <div className="flex items-center justify-center gap-2">
-          <div className={`h-1.5 w-10 rounded-full transition-all duration-300 ${step === 1 ? 'bg-[#141414]' : 'bg-[#D4D4D8]'}`}></div>
-          <div className={`h-1.5 w-10 rounded-full transition-all duration-300 ${step === 2 ? 'bg-[#141414]' : 'bg-[#E5E5E5]'}`}></div>
+          <div className={`h-2 w-12 rounded-full transition-all duration-300 ${step === 1 ? 'bg-[#03D47C]' : 'bg-[#BBE2CE]'}`}></div>
+          <div className={`h-2 w-12 rounded-full transition-all duration-300 ${step === 2 ? 'bg-[#03D47C]' : 'bg-[#DDF2E8]'}`}></div>
         </div>
 
         <div className="text-center">
-          <div className="mx-auto w-12 h-12 rounded-[28%] bg-[#141414] text-white flex items-center justify-center mb-3 shadow-sm animate-float">
-            <Lock className="w-5 h-5" />
+          <div className="mx-auto w-14 h-14 rounded-full bg-[#002E22] text-[#03D47C] flex items-center justify-center mb-3 shadow-md animate-float">
+            <Lock className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#141414]">
+          <h1 className="font-expensify-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#002E22]">
             {step === 1 ? 'Recuperar Contraseña' : 'Validar Código OTP'}
           </h1>
-          <p className="mt-1.5 text-xs text-[#666666]">
+          <p className="mt-1.5 text-xs text-[#3B6E5C]">
             {step === 1
               ? 'Se enviará un código de verificación seguro de 6 dígitos a tu correo'
               : 'Ingresa el código OTP de 6 dígitos que enviamos a tu bandeja de entrada'}
@@ -88,14 +88,14 @@ export const ForgotPasswordPage = () => {
         </div>
 
         {error && (
-          <div className="p-3.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#B91C1C] text-xs font-semibold flex items-center gap-2 animate-slide-up">
+          <div className="p-3.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#B91C1C] text-xs font-bold flex items-center gap-2 animate-slide-up">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-3.5 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl text-[#15803d] text-xs font-semibold flex items-center gap-2 animate-slide-up">
+          <div className="p-3.5 bg-[#C2F5DF] border border-[#03D47C] rounded-xl text-[#002E22] text-xs font-bold flex items-center gap-2 animate-slide-up">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
@@ -104,7 +104,7 @@ export const ForgotPasswordPage = () => {
         {step === 1 ? (
           <form className="space-y-4" onSubmit={handleRequestReset}>
             <div>
-              <label className="block text-xs font-bold text-[#141414] mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-[#002E22] mb-1.5 uppercase tracking-wider">
                 Correo Electrónico Registrado
               </label>
               <input
@@ -113,7 +113,7 @@ export const ForgotPasswordPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu-correo@ejemplo.com"
-                className="input-editorial w-full rounded-xl px-4 py-3 text-sm"
+                className="input-sage w-full rounded-2xl px-4 py-3 text-sm"
                 disabled={loading}
               />
             </div>
@@ -121,11 +121,11 @@ export const ForgotPasswordPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="btn-editorial w-full py-3.5 px-5 rounded-full text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="btn-expensify w-full py-3.5 px-5 rounded-full text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Enviando código...</span>
                 </>
               ) : (
@@ -137,7 +137,7 @@ export const ForgotPasswordPage = () => {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="text-xs font-semibold text-[#666666] hover:text-[#141414] transition-colors cursor-pointer"
+                className="text-xs font-bold text-[#0B533E] hover:text-[#002E22] transition-colors cursor-pointer"
               >
                 ¿Ya recibiste el código? Ingresar código →
               </button>
@@ -145,18 +145,18 @@ export const ForgotPasswordPage = () => {
           </form>
         ) : (
           <form className="space-y-4 animate-slide-up" onSubmit={handleConfirmReset}>
-            <div className="p-3.5 bg-[#F7F7F8] border border-[#E5E5E5] rounded-xl text-xs flex items-start gap-2.5 text-[#141414]">
-              <Inbox className="w-4 h-4 text-[#141414] shrink-0 mt-0.5" />
+            <div className="p-3.5 bg-[#C2F5DF]/60 border border-[#03D47C] rounded-2xl text-xs flex items-start gap-2.5 text-[#002E22]">
+              <Inbox className="w-4 h-4 text-[#002E22] shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-[#141414]">Revisa tu bandeja de entrada</p>
-                <p className="text-[11px] text-[#666666] mt-0.5">
+                <p className="font-bold text-[#002E22]">Revisa tu bandeja de entrada</p>
+                <p className="text-[11px] text-[#0B533E] mt-0.5">
                   El código expira en 10 minutos y es de un solo uso.
                 </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#141414] mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-[#002E22] mb-1.5 uppercase tracking-wider">
                 Código OTP Recibido (6 dígitos)
               </label>
               <input
@@ -166,14 +166,14 @@ export const ForgotPasswordPage = () => {
                 onChange={(e) => setToken(e.target.value)}
                 placeholder="482910"
                 maxLength={64}
-                className="input-editorial w-full rounded-xl px-4 py-3 text-[#141414] text-lg font-mono font-extrabold tracking-[0.35em] text-center"
+                className="input-sage w-full rounded-2xl px-4 py-3 text-[#002E22] text-lg font-mono font-extrabold tracking-[0.35em] text-center"
                 disabled={loading}
                 autoComplete="one-time-code"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#141414] mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-[#002E22] mb-1.5 uppercase tracking-wider">
                 Nueva Contraseña Maestra
               </label>
               <input
@@ -182,7 +182,7 @@ export const ForgotPasswordPage = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Mínimo 12 caracteres complejos"
-                className="input-editorial w-full rounded-xl px-4 py-3 text-sm font-mono"
+                className="input-sage w-full rounded-2xl px-4 py-3 text-sm font-mono"
                 disabled={loading}
               />
               <PasswordStrength password={newPassword} />
@@ -191,11 +191,11 @@ export const ForgotPasswordPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="btn-editorial w-full py-3.5 px-5 rounded-full text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="btn-expensify w-full py-3.5 px-5 rounded-full text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Validando y Cambiando...</span>
                 </>
               ) : (
@@ -207,7 +207,7 @@ export const ForgotPasswordPage = () => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-xs font-semibold text-[#666666] hover:text-[#141414] transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer"
+                className="text-xs font-bold text-[#0B533E] hover:text-[#002E22] transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Solicitar otro código</span>
@@ -216,8 +216,8 @@ export const ForgotPasswordPage = () => {
           </form>
         )}
 
-        <div className="text-center text-xs text-[#666666] pt-4 border-t border-[#E5E5E5]">
-          <Link to="/login" className="text-[#141414] font-bold hover:underline">
+        <div className="text-center text-xs text-[#3B6E5C] pt-4 border-t border-[#BBE2CE]">
+          <Link to="/login" className="text-[#002E22] font-extrabold hover:underline">
             ← Volver al inicio de sesión
           </Link>
         </div>

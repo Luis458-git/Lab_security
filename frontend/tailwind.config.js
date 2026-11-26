@@ -7,34 +7,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        mobbin: {
-          bg: '#FFFFFF',
-          surface: '#F7F7F8',
-          surfaceSubtle: '#FAFAFA',
-          surfaceHover: '#EFEFF1',
-          border: '#E5E5E5',
-          borderHover: '#CCCCCC',
-          borderActive: '#111111',
-          text: '#111111',
-          muted: '#666666',
-          subtle: '#999999',
-          dark: '#111111',
-          darkHover: '#262626'
-        },
-        status: {
-          success: '#15803d',
-          successBg: '#f0fdf4',
-          successBorder: '#bbf7d0',
-          warning: '#b45309',
-          warningBg: '#fffbeb',
-          warningBorder: '#fde68a',
-          danger: '#b91c1c',
-          dangerBg: '#fef2f2',
-          dangerBorder: '#fecaca'
+        expensify: {
+          forest: '#002E22',
+          forestLight: '#064232',
+          forestMid: '#0B533E',
+          emerald: '#03D47C',
+          emeraldHover: '#02B86B',
+          mint: '#C2F5DF',
+          sageBg: '#EDF7F2',
+          sageCard: '#F7FCF9',
+          sageSurface: '#E1F2EA',
+          sageBorder: '#BBE2CE',
+          textDark: '#002E22',
+          textMuted: '#3B6E5C'
         }
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace']
       }
     },

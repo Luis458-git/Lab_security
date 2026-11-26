@@ -16,9 +16,9 @@ export const AppRouter = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-3 bg-white">
-        <div className="w-7 h-7 border-2 border-[#E5E5E5] border-t-[#141414] rounded-full animate-spin"></div>
-        <p className="text-xs text-[#666666] font-mono tracking-wider">Inicializando SecureVault...</p>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-3 bg-[#EDF7F2]">
+        <div className="w-8 h-8 border-2 border-[#BBE2CE] border-t-[#002E22] rounded-full animate-spin"></div>
+        <p className="text-xs text-[#002E22] font-mono tracking-wider font-bold">Inicializando SecureVault...</p>
       </div>
     );
   }

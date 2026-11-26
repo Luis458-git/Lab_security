@@ -16,43 +16,49 @@ export const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E5E5] h-16 flex items-center">
+    <header className="sticky top-0 z-40 bg-[#002E22] border-b border-[#0B533E] h-16 flex items-center shadow-md">
       <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 flex items-center justify-between gap-4">
-        {/* Left: Geometric Brand Mark & Primary Text Links (Mobbin Pattern) */}
+        {/* Left: Expensify-style Bright Green Circle Logo & Navigation Links */}
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center space-x-2.5 group">
-            <div className="w-8 h-8 rounded-[26%] bg-[#141414] text-white flex items-center justify-center font-extrabold text-xs tracking-tighter group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-full bg-[#03D47C] text-[#002E22] flex items-center justify-center font-extrabold text-sm tracking-tighter group-hover:scale-105 transition-transform shadow-sm">
               SV
             </div>
-            <span className="text-base font-bold tracking-tight text-[#141414]">
+            <span className="text-lg font-extrabold tracking-tight text-white">
               SecureVault
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-5">
+          <nav className="hidden md:flex items-center space-x-2">
             <Link
               to="/"
-              className={`text-sm font-semibold transition-colors ${
-                isActive('/') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+              className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+                isActive('/')
+                  ? 'bg-[#0B533E] text-[#03D47C]'
+                  : 'text-[#C2F5DF] hover:text-white hover:bg-[#064232]'
               }`}
             >
-              Explorar
+              Inicio
             </Link>
 
             {isAuthenticated && (
               <>
                 <Link
                   to="/vault"
-                  className={`text-sm font-semibold transition-colors ${
-                    isActive('/vault') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+                  className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+                    isActive('/vault')
+                      ? 'bg-[#0B533E] text-[#03D47C]'
+                      : 'text-[#C2F5DF] hover:text-white hover:bg-[#064232]'
                   }`}
                 >
                   Bóveda
                 </Link>
                 <Link
                   to="/profile"
-                  className={`text-sm font-semibold transition-colors ${
-                    isActive('/profile') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+                  className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+                    isActive('/profile')
+                      ? 'bg-[#0B533E] text-[#03D47C]'
+                      : 'text-[#C2F5DF] hover:text-white hover:bg-[#064232]'
                   }`}
                 >
                   Perfil PII
@@ -60,8 +66,10 @@ export const Navbar = () => {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className={`text-sm font-semibold transition-colors ${
-                      isActive('/admin') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+                    className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
+                      isActive('/admin')
+                        ? 'bg-[#03D47C] text-[#002E22]'
+                        : 'text-[#03D47C] hover:bg-[#064232]'
                     }`}
                   >
                     SecOps
@@ -72,26 +80,26 @@ export const Navbar = () => {
           </nav>
         </div>
 
-        {/* Center: Mobbin Pill Search Trigger */}
+        {/* Center: Pill Search Trigger in Deep Forest Green */}
         <div
           onClick={() => navigate(isAuthenticated ? '/vault' : '/')}
-          className="hidden lg:flex items-center w-80 xl:w-96 h-10 px-4 rounded-full bg-[#F4F4F5] hover:bg-[#EFEFF1] border border-transparent hover:border-[#E5E5E5] text-xs text-[#878787] cursor-pointer transition-all"
+          className="hidden lg:flex items-center w-80 xl:w-96 h-10 px-4 rounded-full bg-[#064232] hover:bg-[#0B533E] border border-[#03D47C]/25 text-xs text-[#C2F5DF] cursor-pointer transition-all"
         >
-          <Search className="w-3.5 h-3.5 mr-2.5 text-[#878787]" />
-          <span>Buscar en pantallas y notas cifradas...</span>
-          <span className="ml-auto text-[10px] font-mono bg-white px-2 py-0.5 rounded-full border border-[#E5E5E5] text-[#666666]">
+          <Search className="w-3.5 h-3.5 mr-2.5 text-[#03D47C]" />
+          <span>Buscar en bóveda y módulos...</span>
+          <span className="ml-auto text-[10px] font-mono bg-[#002E22] px-2.5 py-0.5 rounded-full text-[#03D47C] font-bold">
             AES-256
           </span>
         </div>
 
-        {/* Right: Pill Buttons & User Avatar */}
+        {/* Right: Expensify Pill Buttons */}
         <div className="flex items-center space-x-2.5">
           {isAuthenticated ? (
             <>
               <Link
                 to="/vault"
-                className={`md:hidden px-3 py-1.5 rounded-full text-xs font-semibold ${
-                  isActive('/vault') ? 'bg-[#141414] text-white' : 'bg-[#F4F4F5] text-[#141414]'
+                className={`md:hidden px-3 py-1.5 rounded-full text-xs font-bold ${
+                  isActive('/vault') ? 'bg-[#03D47C] text-[#002E22]' : 'bg-[#064232] text-[#03D47C]'
                 }`}
               >
                 Bóveda
@@ -99,20 +107,20 @@ export const Navbar = () => {
 
               <Link
                 to="/profile"
-                className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-[#F4F4F5] hover:bg-[#EFEFF1] border border-[#E5E5E5] transition-colors"
+                className="flex items-center gap-2 pl-1.5 pr-3.5 py-1 rounded-full bg-[#064232] hover:bg-[#0B533E] border border-[#03D47C]/30 transition-colors"
                 title="Ver perfil de seguridad"
               >
-                <div className="w-6 h-6 rounded-full bg-[#141414] text-white text-[11px] font-bold flex items-center justify-center font-mono">
+                <div className="w-6 h-6 rounded-full bg-[#03D47C] text-[#002E22] text-[11px] font-extrabold flex items-center justify-center font-mono">
                   {(user.fullName || user.email || 'U').charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden sm:inline text-xs font-semibold text-[#141414] truncate max-w-[120px]">
+                <span className="hidden sm:inline text-xs font-bold text-white truncate max-w-[120px]">
                   {user.fullName || user.email}
                 </span>
               </Link>
 
               <button
                 onClick={handleLogout}
-                className="h-9 px-3.5 rounded-full bg-white hover:bg-[#FEF2F2] text-[#666666] hover:text-[#B91C1C] border border-[#E5E5E5] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="h-9 px-3.5 rounded-full bg-[#064232] hover:bg-rose-950 text-[#C2F5DF] hover:text-rose-300 border border-[#0B533E] text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                 title="Cerrar sesión"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -123,15 +131,15 @@ export const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className="h-9 px-4 rounded-full text-xs sm:text-sm font-semibold text-[#666666] hover:text-[#141414] flex items-center transition-colors"
+                className="h-9 px-4 rounded-full bg-[#0B533E] hover:bg-[#0e6b50] text-[#03D47C] text-xs sm:text-sm font-bold flex items-center transition-colors"
               >
                 Iniciar Sesión
               </Link>
               <Link
                 to="/register"
-                className="btn-editorial h-9 px-4 rounded-full text-xs sm:text-sm inline-flex items-center gap-1.5"
+                className="btn-expensify h-9 px-4 rounded-full text-xs sm:text-sm inline-flex items-center gap-1.5"
               >
-                <span>Crear Bóveda</span>
+                <span>Comenzar Gratis</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>
