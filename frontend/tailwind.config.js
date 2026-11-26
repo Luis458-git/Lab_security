@@ -4,24 +4,53 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        mobbin: {
+          bg: '#FFFFFF',
+          surface: '#F7F7F8',
+          surfaceSubtle: '#FAFAFA',
+          surfaceHover: '#F0F0F2',
+          border: '#E5E5E5',
+          borderHover: '#D4D4D8',
+          borderActive: '#111111',
+          text: '#111111',
+          muted: '#666666',
+          subtle: '#8E8E93',
+          dark: '#111111',
+          darkHover: '#262626'
+        },
+        status: {
+          success: '#15803d',
+          successBg: '#f0fdf4',
+          successBorder: '#bbf7d0',
+          warning: '#b45309',
+          warningBg: '#fffbeb',
+          warningBorder: '#fde68a',
+          danger: '#b91c1c',
+          dangerBg: '#fef2f2',
+          dangerBorder: '#fecaca'
+        },
+        // Mapeo retrocompatible para clases vault legacy
         vault: {
-          bg: '#090d16',
-          card: '#111827',
-          surface: '#161f33',
-          border: '#1f2937',
-          borderHover: '#374151',
-          emerald: '#10b981',
-          amber: '#f59e0b',
-          red: '#ef4444'
+          bg: '#FFFFFF',
+          card: '#FFFFFF',
+          surface: '#F7F7F8',
+          border: '#E5E5E5',
+          borderHover: '#D4D4D8',
+          emerald: '#111111',
+          amber: '#b45309',
+          red: '#b91c1c'
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+        sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace']
+      },
+      letterSpacing: {
+        tightest: '-0.03em',
+        tighter: '-0.02em',
       }
     },
   },

@@ -3,68 +3,60 @@
 @tailwind utilities;
 
 :root {
-  --vault-bg: #090d16;
-  --vault-card: #111827;
-  --vault-border: #1f2937;
-  --vault-emerald: #10b981;
-  --vault-amber: #f59e0b;
-  --vault-red: #ef4444;
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F7F7F8;
+  --border-color: #E5E5E5;
+  --text-primary: #111111;
+  --text-muted: #666666;
 }
 
 @layer base {
   body {
-    background-color: var(--vault-bg);
-    color: #f3f4f6;
+    background-color: #FFFFFF;
+    color: #111111;
     min-height: 100vh;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    selection-background-color: #10b981;
-    selection-color: #090d16;
   }
 
   ::selection {
-    background-color: #10b981;
-    color: #090d16;
+    background-color: #111111;
+    color: #FFFFFF;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    color: #111111;
   }
 }
 
-/* Custom scrollbars for vault theme */
+/* Patrón de cuadrícula editorial estilo Mobbin */
+.bg-dot-grid {
+  background-image: radial-gradient(#E5E5E5 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Custom scrollbars minimalistas */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #FFFFFF;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
+  background: #E5E5E5;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #D4D4D8;
 }
 
-/* Subtle fade in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Transition utility classes */
+/* Transiciones suaves sin saltos */
 .transition-surface {
-  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import client from '../../api/client.js';
-import { Activity, ShieldCheck, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 export const Footer = () => {
   const [healthStatus, setHealthStatus] = useState('checking'); // 'online' | 'offline' | 'checking'
@@ -24,68 +24,56 @@ export const Footer = () => {
 
   useEffect(() => {
     checkHealth();
-    const interval = setInterval(checkHealth, 45000); // Chequeo periódico discreto
+    const interval = setInterval(checkHealth, 45000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <footer className="mt-auto border-t border-vault-border bg-vault-bg/80 text-xs text-gray-500 py-5 transition-surface">
+    <footer className="mt-auto border-t border-mobbin-border bg-mobbin-surface text-xs text-mobbin-muted py-6 transition-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Left: Security specs & standards */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-center sm:text-left">
-          <span className="font-semibold text-gray-400 flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-vault-emerald" />
-            SecureVault AppSec
-          </span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-center sm:text-left text-mobbin-muted font-mono text-[11px]">
+          <span className="font-semibold text-mobbin-text font-sans">SecureVault Zero-Trust</span>
           <span>•</span>
-          <span className="text-gray-400 font-mono text-[11px]">Envelope: AES-256-GCM</span>
+          <span>Envelope: AES-256-GCM</span>
           <span>•</span>
-          <span className="text-gray-400 font-mono text-[11px]">Argon2id (RFC 9106)</span>
+          <span>Argon2id (RFC 9106)</span>
           <span>•</span>
-          <span className="text-gray-400 font-mono text-[11px]">OWASP Top 10:2025</span>
+          <span>OWASP Top 10:2025</span>
         </div>
 
         {/* Right: Discrete Health status (RF-08) */}
-        <div className="flex items-center space-x-2.5 bg-vault-card px-3 py-1.5 rounded-full border border-vault-border">
+        <div className="flex items-center space-x-2.5 bg-white px-3 py-1.5 rounded-full border border-mobbin-border shadow-xs">
           <div className="flex items-center space-x-2">
             {healthStatus === 'online' && (
               <>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vault-emerald opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-vault-emerald"></span>
-                </span>
-                <span className="text-[11px] font-medium text-gray-300 font-sans">
-                  Estado del sistema: <span className="text-vault-emerald font-semibold">Operativo</span>
+                <span className="inline-block w-2 h-2 rounded-full bg-status-success"></span>
+                <span className="text-[11px] text-mobbin-muted font-sans">
+                  Sistema: <strong className="text-mobbin-text font-semibold">Operativo</strong>
                 </span>
               </>
             )}
-
             {healthStatus === 'offline' && (
               <>
-                <span className="inline-flex rounded-full h-2 w-2 bg-vault-red"></span>
-                <span className="text-[11px] font-medium text-gray-300 font-sans">
-                  Estado del sistema: <span className="text-vault-red font-semibold">Sin conexión</span>
+                <span className="inline-block w-2 h-2 rounded-full bg-status-danger"></span>
+                <span className="text-[11px] text-status-danger font-medium font-sans">
+                  Desconectado
                 </span>
               </>
             )}
-
             {healthStatus === 'checking' && (
               <>
-                <span className="inline-flex rounded-full h-2 w-2 bg-gray-500 animate-pulse"></span>
-                <span className="text-[11px] text-gray-400 font-sans">
-                  Verificando salud...
-                </span>
+                <span className="inline-block w-2 h-2 rounded-full bg-mobbin-subtle animate-pulse"></span>
+                <span className="text-[11px] text-mobbin-muted font-sans">Comprobando...</span>
               </>
             )}
           </div>
-
           <button
             onClick={checkHealth}
-            disabled={isRefreshing}
-            title="Refrescar estado de salud"
-            className="text-gray-500 hover:text-vault-emerald transition-colors p-0.5"
+            className="text-mobbin-muted hover:text-mobbin-text transition-colors p-0.5 rounded cursor-pointer"
+            title="Actualizar estado del servidor"
           >
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-vault-emerald' : ''}`} />
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>

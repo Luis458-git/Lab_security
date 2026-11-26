@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import authService from '../services/auth.service.js';
 import PasswordStrength from '../components/security/PasswordStrength.jsx';
-import { ShieldCheck, Mail, Lock, ArrowLeft, Loader2, AlertOctagon, CheckCircle2, Hash, Inbox } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, ArrowLeft, Loader2, AlertCircle, CheckCircle2, Hash, Inbox } from 'lucide-react';
 
 export const ForgotPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -67,31 +67,32 @@ export const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 bg-vault-card border border-vault-border p-8 rounded-2xl shadow-xl transition-surface">
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-mobbin-surface bg-dot-grid">
+      <div className="max-w-md w-full space-y-6 bg-white border border-mobbin-border p-8 sm:p-10 rounded-2xl shadow-xs transition-surface">
         <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-vault-surface border border-vault-border rounded-xl flex items-center justify-center text-vault-emerald mb-3">
-            <ShieldCheck className="w-6 h-6 text-vault-emerald" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-mobbin-surface border border-mobbin-border text-[11px] font-mono text-mobbin-muted mb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+            NIST SP 800-63B OTP
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white font-sans">
-            {step === 1 ? 'Recuperar Contraseña' : 'Validar Código de Correo'}
-          </h2>
-          <p className="mt-1 text-xs text-gray-400">
+          <h1 className="text-2xl font-bold tracking-tight text-mobbin-text">
+            {step === 1 ? 'Recuperar Contraseña' : 'Validar Código OTP'}
+          </h1>
+          <p className="mt-1.5 text-xs text-mobbin-muted">
             {step === 1
-              ? 'Se enviará un código de verificación OTP a tu correo electrónico'
+              ? 'Se enviará un código de verificación seguro de 6 dígitos a tu correo'
               : 'Ingresa el código OTP de 6 dígitos que enviamos a tu bandeja de entrada'}
           </p>
         </div>
 
         {error && (
-          <div className="p-3.5 bg-rose-950/40 border border-vault-red/60 rounded-xl text-vault-red text-xs flex items-center gap-2">
-            <AlertOctagon className="w-4 h-4 shrink-0" />
+          <div className="p-3.5 bg-status-dangerBg border border-status-dangerBorder rounded-lg text-status-danger text-xs font-medium flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-3.5 bg-emerald-950/40 border border-emerald-900/60 rounded-xl text-vault-emerald text-xs font-medium flex items-center gap-2">
+          <div className="p-3.5 bg-status-successBg border border-status-successBorder rounded-lg text-status-success text-xs font-medium flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
@@ -100,32 +101,29 @@ export const ForgotPasswordPage = () => {
         {step === 1 ? (
           <form className="space-y-4" onSubmit={handleRequestReset}>
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">
+              <label className="block text-xs font-semibold text-mobbin-text mb-1.5 uppercase tracking-wider">
                 Correo Electrónico Registrado
               </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu-correo@ejemplo.com"
-                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                  disabled={loading}
-                />
-              </div>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu-correo@ejemplo.com"
+                className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors"
+                disabled={loading}
+              />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-emerald-950/40 flex items-center justify-center gap-2"
+              className="w-full py-2.5 px-4 rounded-lg bg-mobbin-dark hover:bg-mobbin-darkHover text-white font-medium text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Enviando código al correo...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Enviando código...</span>
                 </>
               ) : (
                 <span>Enviar Código a Mi Correo</span>
@@ -136,72 +134,66 @@ export const ForgotPasswordPage = () => {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="text-xs text-gray-400 hover:text-vault-emerald transition-colors"
+                className="text-xs text-mobbin-muted hover:text-mobbin-text transition-colors"
               >
-                ¿Ya recibiste el código en tu correo? Ingresar código →
+                ¿Ya recibiste el código? Ingresar código →
               </button>
             </div>
           </form>
         ) : (
           <form className="space-y-4" onSubmit={handleConfirmReset}>
-            <div className="p-3 bg-vault-surface/60 border border-vault-border rounded-xl text-xs flex items-start gap-2.5 text-gray-300">
-              <Inbox className="w-4 h-4 text-vault-emerald shrink-0 mt-0.5" />
+            <div className="p-3 bg-mobbin-surface border border-mobbin-border rounded-lg text-xs flex items-start gap-2.5 text-mobbin-text">
+              <Inbox className="w-4 h-4 text-mobbin-text shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-gray-200">Revisa tu correo</p>
-                <p className="text-[11px] text-gray-400 mt-0.5">
-                  Búscalo en tu bandeja principal o en la carpeta de <strong>spam / correo no deseado</strong>. El código expira en 10 minutos.
+                <p className="font-semibold text-mobbin-text">Revisa tu bandeja de entrada</p>
+                <p className="text-[11px] text-mobbin-muted mt-0.5">
+                  El código expira en 10 minutos y es de un solo uso.
                 </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">
+              <label className="block text-xs font-semibold text-mobbin-text mb-1.5 uppercase tracking-wider">
                 Código OTP Recibido (6 dígitos)
               </label>
-              <div className="relative">
-                <Hash className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-                <input
-                  type="text"
-                  required
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  placeholder="Ej: 482910"
-                  maxLength={64}
-                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-base font-mono font-bold tracking-widest transition-colors text-center"
-                  disabled={loading}
-                  autoComplete="one-time-code"
-                />
-              </div>
+              <input
+                type="text"
+                required
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="Ej: 482910"
+                maxLength={64}
+                className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-mobbin-text text-lg font-mono font-bold tracking-widest text-center focus:outline-none focus:border-mobbin-borderActive transition-colors"
+                disabled={loading}
+                autoComplete="one-time-code"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">
-                Nueva Contraseña
+              <label className="block text-xs font-semibold text-mobbin-text mb-1.5 uppercase tracking-wider">
+                Nueva Contraseña Maestra
               </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-                <input
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Mínimo 12 caracteres complejos"
-                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                  disabled={loading}
-                />
-              </div>
+              <input
+                type="password"
+                required
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Mínimo 12 caracteres complejos"
+                className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors font-mono"
+                disabled={loading}
+              />
               <PasswordStrength password={newPassword} />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors disabled:opacity-50 shadow-sm shadow-emerald-950/40 flex items-center justify-center gap-2"
+              className="w-full py-2.5 px-4 rounded-lg bg-mobbin-dark hover:bg-mobbin-darkHover text-white font-medium text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Validando y Cambiando Contraseña...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Validando y Cambiando...</span>
                 </>
               ) : (
                 <span>Confirmar y Cambiar Contraseña</span>
@@ -212,17 +204,17 @@ export const ForgotPasswordPage = () => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-xs text-gray-400 hover:text-vault-emerald transition-colors flex items-center justify-center gap-1 mx-auto"
+                className="text-xs text-mobbin-muted hover:text-mobbin-text transition-colors flex items-center justify-center gap-1 mx-auto"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>¿No te llegó? Solicitar otro código</span>
+                <span>Solicitar otro código</span>
               </button>
             </div>
           </form>
         )}
 
-        <div className="text-center text-xs text-gray-500 pt-3 border-t border-vault-border">
-          <Link to="/login" className="text-vault-emerald hover:underline font-medium">
+        <div className="text-center text-xs text-mobbin-muted pt-3 border-t border-mobbin-border">
+          <Link to="/login" className="text-mobbin-text font-semibold hover:underline">
             Volver al inicio de sesión
           </Link>
         </div>

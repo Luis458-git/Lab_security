@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import PasswordStrength from '../components/security/PasswordStrength.jsx';
-import { UserPlus, Mail, User, Phone, Lock, CheckCircle2, AlertOctagon, Loader2, ShieldCheck } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight, Loader2, ShieldCheck, Lock } from 'lucide-react';
 
 export const RegisterPage = () => {
   const { register } = useAuth();
@@ -52,22 +52,26 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 bg-vault-card border border-vault-border p-8 rounded-2xl shadow-xl transition-surface">
-        <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-vault-surface border border-vault-border rounded-xl flex items-center justify-center text-vault-emerald mb-3">
-            <UserPlus className="w-6 h-6 text-vault-emerald" />
+    <div className="min-h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-2 bg-white">
+      {/* Columna Izquierda: Formulario Editorial */}
+      <div className="flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 py-12 max-w-xl mx-auto w-full">
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-mobbin-surface border border-mobbin-border text-[11px] font-mono text-mobbin-muted mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-mobbin-dark"></span>
+            Creación de Bóveda Privada
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white font-sans">Crear Bóveda Segura</h2>
-          <p className="mt-1 text-xs text-gray-400">
-            Cifrado de extremo a reposo alineado con OWASP Top 10:2025
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-mobbin-text mb-2">
+            Crear cuenta en SecureVault
+          </h1>
+          <p className="text-sm text-mobbin-muted">
+            Tus datos personales y notas quedan cifrados con llaves únicas e inaccesibles para terceros.
           </p>
         </div>
 
         {error && (
-          <div className="p-4 bg-rose-950/40 border border-vault-red/60 rounded-xl text-vault-red text-xs space-y-1">
+          <div className="mb-6 p-4 rounded-lg bg-status-dangerBg border border-status-dangerBorder text-status-danger text-xs space-y-1">
             <div className="flex items-center gap-2 font-semibold">
-              <AlertOctagon className="w-4 h-4 shrink-0" />
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
             {issues.length > 0 && (
@@ -81,7 +85,7 @@ export const RegisterPage = () => {
         )}
 
         {success && (
-          <div className="p-3.5 bg-emerald-950/40 border border-emerald-900/60 rounded-xl text-vault-emerald text-xs font-medium flex items-center gap-2">
+          <div className="mb-6 p-3.5 rounded-lg bg-status-successBg border border-status-successBorder text-status-success text-xs font-medium flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
@@ -89,96 +93,167 @@ export const RegisterPage = () => {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Nombre Completo</label>
-            <div className="relative">
-              <User className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Juan Pérez"
-                className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                disabled={loading}
-              />
-            </div>
+            <label className="block text-xs font-semibold text-mobbin-text mb-1.5 uppercase tracking-wider">
+              Nombre Completo
+            </label>
+            <input
+              type="text"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Ej. Luis Méndez"
+              className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors"
+              disabled={loading}
+            />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Correo Electrónico</label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="juan@ejemplo.com"
-                className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                disabled={loading}
-              />
-            </div>
+            <label className="block text-xs font-semibold text-mobbin-text mb-1.5 uppercase tracking-wider">
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="nombre@ejemplo.com"
+              className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors"
+              disabled={loading}
+            />
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-1 text-xs">
-              <label className="font-medium text-gray-300">Teléfono Personal (Opcional)</label>
-              <span className="text-[10px] text-vault-emerald flex items-center gap-1 font-mono">
-                <ShieldCheck className="w-3 h-3" />
-                Cifrado con AES-256-GCM
-              </span>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-mobbin-text uppercase tracking-wider">
+                Teléfono de Contacto
+              </label>
+              <span className="text-[11px] font-mono text-mobbin-muted">Cifrado con AES-256</span>
             </div>
-            <div className="relative">
-              <Phone className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+52 55 1234 5678"
-                className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                disabled={loading}
-              />
-            </div>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+506 8888-8888 (Opcional)"
+              className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors"
+              disabled={loading}
+            />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Contraseña Maestra</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 12 caracteres complejos"
-                className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                disabled={loading}
-              />
-            </div>
+            <label className="block text-xs font-semibold text-mobbin-text mb-1.5 uppercase tracking-wider">
+              Contraseña Maestra (Mínimo 12 caracteres)
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Mínimo 12 caracteres complejos"
+              className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors font-mono"
+              disabled={loading}
+            />
             <PasswordStrength password={password} />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 px-4 rounded-lg bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-emerald-950/40 flex items-center justify-center gap-2"
+            className="w-full mt-2 py-2.5 px-4 rounded-lg bg-mobbin-dark hover:bg-mobbin-darkHover text-white font-medium text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Generando Hashes y Claves...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Generando Hash Argon2id...</span>
               </>
             ) : (
-              <span>Registrar Bóveda Segura</span>
+              <>
+                <span>Registrar Bóveda Segura</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
             )}
           </button>
         </form>
 
-        <div className="text-center text-xs text-gray-500 pt-3 border-t border-vault-border">
-          ¿Ya tienes cuenta activa?{' '}
-          <Link to="/login" className="text-vault-emerald hover:underline font-medium">
-            Inicia sesión aquí
+        <div className="mt-8 pt-6 border-t border-mobbin-border text-center text-xs text-mobbin-muted">
+          ¿Ya tienes una cuenta registrada?{' '}
+          <Link to="/login" className="text-mobbin-text font-semibold hover:underline">
+            Iniciar sesión
           </Link>
+        </div>
+      </div>
+
+      {/* Columna Derecha: Panel Visual Estilo Mobbin */}
+      <div className="hidden lg:flex flex-col justify-between p-12 xl:p-16 bg-mobbin-surface border-l border-mobbin-border bg-dot-grid relative">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-mono font-medium text-mobbin-muted tracking-wider uppercase">
+            Aislamiento de Cuentas (OWASP A01)
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-mobbin-border text-[11px] font-mono text-mobbin-text font-medium">
+            Tenant Isolation
+          </span>
+        </div>
+
+        {/* Feature Highlights */}
+        <div className="my-auto max-w-md mx-auto w-full space-y-6">
+          <div className="space-y-3">
+            <h2 className="text-2xl xl:text-3xl font-bold tracking-tight text-mobbin-text leading-snug">
+              Cero conocimiento. Datos aislados por diseño.
+            </h2>
+            <p className="text-sm text-mobbin-muted leading-relaxed">
+              Cada cuenta registrada posee un espacio de almacenamiento segregado. Las consultas se aíslan a nivel de base de datos con verificación estricta de pertenencia.
+            </p>
+          </div>
+
+          {/* Cards de características criptográficas */}
+          <div className="space-y-3">
+            <div className="bg-white border border-mobbin-border rounded-xl p-4 shadow-xs flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-mobbin-surface border border-mobbin-border flex items-center justify-center shrink-0 mt-0.5">
+                <span className="text-xs font-mono font-bold text-mobbin-text">01</span>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-mobbin-text uppercase tracking-wider mb-1">
+                  Envelope Encryption (AES-256-GCM)
+                </h3>
+                <p className="text-xs text-mobbin-muted leading-relaxed">
+                  Cada texto se cifra con un IV aleatorio único de 12 bytes generado por CSPRNG y etiqueta de autenticación para detectar manipulación.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-mobbin-border rounded-xl p-4 shadow-xs flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-mobbin-surface border border-mobbin-border flex items-center justify-center shrink-0 mt-0.5">
+                <span className="text-xs font-mono font-bold text-mobbin-text">02</span>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-mobbin-text uppercase tracking-wider mb-1">
+                  Hashing RFC 9106 (Argon2id)
+                </h3>
+                <p className="text-xs text-mobbin-muted leading-relaxed">
+                  Contraseñas protegidas contra ataques por GPU y ASICs con configuración de memoria intensiva (64 MB, 3 iteraciones).
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-mobbin-border rounded-xl p-4 shadow-xs flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-mobbin-surface border border-mobbin-border flex items-center justify-center shrink-0 mt-0.5">
+                <span className="text-xs font-mono font-bold text-mobbin-text">03</span>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-mobbin-text uppercase tracking-wider mb-1">
+                  Auditoría Forense Inmutable
+                </h3>
+                <p className="text-xs text-mobbin-muted leading-relaxed">
+                  Cualquier intento de alteración o acceso no autorizado es registrado automáticamente en la bitácora con IP y User-Agent.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer del panel visual */}
+        <div className="flex items-center justify-between text-xs text-mobbin-muted font-mono pt-6 border-t border-mobbin-border">
+          <span>RFC 9106 Argon2id</span>
+          <span>NIST SP 800-38D</span>
         </div>
       </div>
     </div>

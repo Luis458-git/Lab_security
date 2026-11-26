@@ -9,7 +9,7 @@ export function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen flex flex-col bg-vault-bg text-gray-100 font-sans selection:bg-vault-emerald selection:text-vault-bg">
+        <div className="min-h-screen flex flex-col bg-white text-mobbin-text font-sans antialiased selection:bg-mobbin-dark selection:text-white">
           <Navbar />
           <main className="flex-1">
             <AppRouter />

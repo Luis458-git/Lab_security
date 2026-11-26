@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Database, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 export const QuotaBar = ({ count = 0, max = 20 }) => {
   const percent = Math.min((count / max) * 100, 100);
@@ -7,58 +7,58 @@ export const QuotaBar = ({ count = 0, max = 20 }) => {
   const isAtLimit = count >= max;
 
   const getBarColor = () => {
-    if (isAtLimit) return 'bg-vault-red';
-    if (isNearLimit) return 'bg-vault-amber';
-    return 'bg-vault-emerald';
+    if (isAtLimit) return 'bg-status-danger';
+    if (isNearLimit) return 'bg-status-warning';
+    return 'bg-mobbin-dark';
   };
 
   const getBadgeStyle = () => {
-    if (isAtLimit) return 'bg-rose-950/60 text-vault-red border-rose-900/50';
-    if (isNearLimit) return 'bg-amber-950/60 text-vault-amber border-amber-900/50';
-    return 'bg-emerald-950/60 text-vault-emerald border-emerald-900/50';
+    if (isAtLimit) return 'bg-status-dangerBg text-status-danger border-status-dangerBorder';
+    if (isNearLimit) return 'bg-status-warningBg text-status-warning border-status-warningBorder';
+    return 'bg-white text-mobbin-text border-mobbin-border';
   };
 
   return (
-    <div className="bg-vault-card border border-vault-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-surface">
+    <div className="bg-mobbin-surface border border-mobbin-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-surface">
       <div>
-        <div className="flex items-center space-x-2">
-          <Database className="w-4 h-4 text-vault-emerald" />
-          <span className="text-sm font-semibold text-white">Capacidad de la Bóveda</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full font-mono border ${getBadgeStyle()}`}>
+        <div className="flex items-center space-x-2.5">
+          <Database className="w-4 h-4 text-mobbin-text" />
+          <span className="text-sm font-bold text-mobbin-text">Capacidad de la Bóveda</span>
+          <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono border ${getBadgeStyle()}`}>
             {count} / {max} notas utilizadas
           </span>
         </div>
-        <p className="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+        <p className="text-xs text-mobbin-muted mt-1.5 flex items-center gap-1.5">
           {isAtLimit ? (
             <>
-              <AlertTriangle className="w-3.5 h-3.5 text-vault-red shrink-0" />
-              <span className="text-vault-red font-medium">Límite alcanzado (A06: Insecure Design). Elimina notas para liberar cuota.</span>
+              <AlertTriangle className="w-3.5 h-3.5 text-status-danger shrink-0" />
+              <span className="text-status-danger font-medium">Límite alcanzado (A06: Insecure Design). Elimina notas para liberar cuota.</span>
             </>
           ) : isNearLimit ? (
             <>
-              <AlertTriangle className="w-3.5 h-3.5 text-vault-amber shrink-0" />
+              <AlertTriangle className="w-3.5 h-3.5 text-status-warning shrink-0" />
               <span>Te aproximas a la cuota máxima permitida ({max} notas).</span>
             </>
           ) : (
             <>
-              <ShieldCheck className="w-3.5 h-3.5 text-vault-emerald shrink-0" />
-              <span>Cada nota se cifra individualmente con AES-256-GCM y clave única.</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-status-success shrink-0" />
+              <span>Aislamiento por usuario y cifrado individual AES-256-GCM por cada nota.</span>
             </>
           )}
         </p>
       </div>
 
-      <div className="w-full sm:w-52 flex flex-col gap-1.5">
-        <div className="h-2 w-full bg-vault-surface rounded-full overflow-hidden border border-vault-border">
+      <div className="w-full sm:w-56 flex flex-col gap-1.5">
+        <div className="h-2 w-full bg-mobbin-border rounded-full overflow-hidden">
           <div
             className={`h-full transition-all duration-500 ${getBarColor()}`}
             style={{ width: `${percent}%` }}
           />
         </div>
-        <div className="flex justify-between text-[10px] font-mono text-gray-500">
+        <div className="flex justify-between text-[10px] font-mono text-mobbin-muted">
           <span>0</span>
           <span>{Math.round(percent)}% utilizado</span>
-          <span>{max} máx</span>
+          <span>{max}</span>
         </div>
       </div>
     </div>

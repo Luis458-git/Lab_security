@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { Lock, Mail, AlertOctagon, ShieldAlert, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ShieldAlert, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 
 export const LoginPage = () => {
   const { login } = useAuth();
@@ -48,119 +48,188 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 bg-vault-card border border-vault-border p-8 rounded-2xl shadow-xl transition-surface">
-        {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-vault-surface border border-vault-border rounded-xl flex items-center justify-center text-vault-emerald mb-3">
-            <Lock className="w-6 h-6 text-vault-emerald" />
+    <div className="min-h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-2 bg-white">
+      {/* Columna Izquierda: Formulario Editorial */}
+      <div className="flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 py-12 max-w-xl mx-auto w-full">
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-mobbin-surface border border-mobbin-border text-[11px] font-mono text-mobbin-muted mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+            Zero-Trust Architecture
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white font-sans">Acceso a la Bóveda</h2>
-          <p className="mt-1 text-xs text-gray-400">
-            Autenticación lenta con Argon2id y cookies de sesión HttpOnly
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-mobbin-text mb-2">
+            Inicia sesión en SecureVault
+          </h1>
+          <p className="text-sm text-mobbin-muted">
+            Protección de identidad con Argon2id y sesiones HttpOnly blindadas.
           </p>
         </div>
 
-        {/* Banner destacado de Bloqueo por Fuerza Bruta (HTTP 429 / 423 - A07) */}
+        {/* Alerta Rate Limit (HTTP 429) - Estilo sobrio ámbar */}
         {isRateLimited && (
-          <div className="p-4 rounded-xl bg-amber-950/40 border border-vault-amber/80 text-vault-amber text-xs space-y-1 animate-fade-in shadow-lg shadow-amber-950/20">
-            <div className="flex items-center gap-2 font-bold text-sm text-amber-200">
-              <AlertOctagon className="w-4 h-4 text-vault-amber shrink-0" />
-              <span>Bloqueo por Fuerza Bruta (HTTP 429)</span>
+          <div className="mb-6 p-4 rounded-lg bg-status-warningBg border border-status-warningBorder text-status-warning text-xs space-y-1">
+            <div className="flex items-center gap-2 font-semibold text-sm">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>Límite de solicitudes excedido (HTTP 429)</span>
             </div>
-            <p className="text-amber-300 leading-relaxed pt-0.5">
+            <p className="text-[13px] leading-relaxed text-amber-900">
               {error}
             </p>
           </div>
         )}
 
+        {/* Alerta Cuenta Bloqueada (HTTP 423) - Estilo sobrio rojo */}
         {isLocked && !isRateLimited && (
-          <div className="p-4 rounded-xl bg-rose-950/40 border border-vault-red/80 text-vault-red text-xs space-y-1 animate-fade-in shadow-lg shadow-rose-950/20">
-            <div className="flex items-center gap-2 font-bold text-sm text-rose-200">
-              <ShieldAlert className="w-4 h-4 text-vault-red shrink-0" />
-              <span>Cuenta Temporalmente Bloqueada (HTTP 423)</span>
+          <div className="mb-6 p-4 rounded-lg bg-status-dangerBg border border-status-dangerBorder text-status-danger text-xs space-y-1">
+            <div className="flex items-center gap-2 font-semibold text-sm">
+              <ShieldAlert className="w-4 h-4 shrink-0" />
+              <span>Cuenta Bloqueada Temporalmente (HTTP 423)</span>
             </div>
-            <p className="text-rose-300 leading-relaxed pt-0.5">
+            <p className="text-[13px] leading-relaxed text-red-900">
               {error}
             </p>
           </div>
         )}
 
+        {/* Error Estándar */}
         {error && !isRateLimited && !isLocked && (
-          <div className="p-3.5 rounded-lg bg-rose-950/30 border border-rose-900/50 text-vault-red text-xs font-medium flex items-center gap-2">
-            <AlertOctagon className="w-4 h-4 shrink-0 text-vault-red" />
+          <div className="mb-6 p-3.5 rounded-lg bg-status-dangerBg border border-status-dangerBorder text-status-danger text-xs font-medium flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">
+            <label className="block text-xs font-semibold text-mobbin-text mb-1.5 uppercase tracking-wider">
               Correo Electrónico
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu-correo@ejemplo.com"
-                className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                disabled={loading || isRateLimited}
+                placeholder="nombre@ejemplo.com"
+                className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors"
+                disabled={loading}
               />
             </div>
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-medium text-gray-300">Contraseña</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-mobbin-text uppercase tracking-wider">
+                Contraseña Maestra
+              </label>
               <Link
                 to="/forgot-password"
-                className="text-xs text-vault-emerald hover:text-emerald-300 transition-colors"
+                className="text-xs text-mobbin-muted hover:text-mobbin-text transition-colors"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>
             <div className="relative">
-              <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-sm transition-colors"
-                disabled={loading || isRateLimited}
+                className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-sm text-mobbin-text placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors font-mono"
+                disabled={loading}
               />
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={loading || isRateLimited}
-            className="w-full py-2.5 px-4 rounded-lg bg-vault-emerald hover:bg-emerald-400 text-vault-bg font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-emerald-950/40 flex items-center justify-center gap-2 mt-2"
+            disabled={loading}
+            className="w-full mt-2 py-2.5 px-4 rounded-lg bg-mobbin-dark hover:bg-mobbin-darkHover text-white font-medium text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Verificando con Argon2id...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Verificando credenciales...</span>
               </>
             ) : (
               <>
-                <span>Desbloquear Bóveda</span>
+                <span>Iniciar Sesión</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        <div className="text-center text-xs text-gray-500 pt-3 border-t border-vault-border">
-          ¿No tienes una cuenta aún?{' '}
-          <Link to="/register" className="text-vault-emerald hover:underline font-medium">
-            Regístrate aquí
+        <div className="mt-8 pt-6 border-t border-mobbin-border text-center text-xs text-mobbin-muted">
+          ¿Aún no tienes una bóveda personal?{' '}
+          <Link to="/register" className="text-mobbin-text font-semibold hover:underline">
+            Crear cuenta segura
           </Link>
+        </div>
+      </div>
+
+      {/* Columna Derecha: Panel Visual Estilo Mobbin */}
+      <div className="hidden lg:flex flex-col justify-between p-12 xl:p-16 bg-mobbin-surface border-l border-mobbin-border bg-dot-grid relative">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-mono font-medium text-mobbin-muted tracking-wider uppercase">
+            Plataforma de Bóvedas Cifradas
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-mobbin-border text-[11px] font-mono text-status-success font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+            AES-256-GCM
+          </span>
+        </div>
+
+        {/* Hero Visual Card: Previsualización de Nota Cifrada */}
+        <div className="my-auto max-w-md mx-auto w-full space-y-6">
+          <div className="space-y-3">
+            <h2 className="text-2xl xl:text-3xl font-bold tracking-tight text-mobbin-text leading-snug">
+              Privacidad absoluta por diseño. Cifrado de extremo a reposo.
+            </h2>
+            <p className="text-sm text-mobbin-muted leading-relaxed">
+              Tus secretos se cifran en el servidor con llaves únicas de 256 bits antes de persistir en PostgreSQL. Ni siquiera los administradores pueden leer tus notas.
+            </p>
+          </div>
+
+          {/* Tarjeta estática minimalista de nota cifrada */}
+          <div className="bg-white border border-mobbin-border rounded-xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-mobbin-border">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-mobbin-dark"></div>
+                <span className="text-xs font-bold text-mobbin-text">Credenciales de Infraestructura</span>
+              </div>
+              <span className="text-[10px] font-mono text-mobbin-muted bg-mobbin-surface px-2 py-0.5 rounded border border-mobbin-border">
+                CONFIDENCIAL
+              </span>
+            </div>
+
+            <div className="space-y-2 text-xs font-mono">
+              <div className="flex justify-between text-[11px] text-mobbin-muted">
+                <span>Payload Cifrado:</span>
+                <span className="text-mobbin-text font-bold">128 bytes</span>
+              </div>
+              <div className="bg-mobbin-surface p-2.5 rounded-lg border border-mobbin-border text-[11px] text-mobbin-muted break-all leading-relaxed select-all">
+                e83f9104cb1a29f8d42018ea37bc...49102c9a
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] font-mono text-mobbin-muted">
+              <div className="bg-mobbin-surface p-2 rounded border border-mobbin-border">
+                <span className="block text-[10px] text-mobbin-subtle uppercase">Algoritmo</span>
+                <span className="font-semibold text-mobbin-text">AES-256-GCM</span>
+              </div>
+              <div className="bg-mobbin-surface p-2 rounded border border-mobbin-border">
+                <span className="block text-[10px] text-mobbin-subtle uppercase">Derivación</span>
+                <span className="font-semibold text-mobbin-text">Argon2id RFC 9106</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer del panel visual */}
+        <div className="flex items-center justify-between text-xs text-mobbin-muted font-mono pt-6 border-t border-mobbin-border">
+          <span>OWASP Top 10:2025</span>
+          <span>NIST SP 800-63B</span>
         </div>
       </div>
     </div>
