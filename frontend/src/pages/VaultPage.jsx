@@ -3,7 +3,7 @@ import notesService from '../services/notes.service.js';
 import QuotaBar from '../components/notes/QuotaBar.jsx';
 import NoteCard from '../components/notes/NoteCard.jsx';
 import NoteModal from '../components/notes/NoteModal.jsx';
-import { Plus, Search, FolderLock, Lock, X, Loader2, AlertOctagon, Sparkles } from 'lucide-react';
+import { Plus, Search, Lock, X, Loader2, AlertOctagon, FileText } from 'lucide-react';
 
 export const VaultPage = () => {
   const [notes, setNotes] = useState([]);
@@ -73,26 +73,27 @@ export const VaultPage = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Header and Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-slide-up">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono mb-2">
-            <FolderLock className="w-3.5 h-3.5" />
-            <span>Almacenamiento Cifrado Zero-Trust</span>
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-14 py-8 sm:py-10 space-y-6">
+      {/* Mobbin Style App Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E5E5E5] animate-slide-up">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-[28%] bg-[#141414] text-white flex items-center justify-center shadow-sm shrink-0">
+            <Lock className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Bóveda de <span className="text-gradient-emerald">Notas Privadas</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Tus notas se descifran únicamente en memoria bajo demanda con verificación de integridad GCM.
-          </p>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#141414] tracking-tight">
+              Bóveda de Notas Privadas
+            </h1>
+            <p className="text-xs sm:text-sm text-[#666666] mt-0.5">
+              Envelope Encryption (AES-256-GCM) en reposo • Descifrado bajo demanda en memoria (RF-04)
+            </p>
+          </div>
         </div>
 
         <button
           onClick={handleOpenCreate}
           disabled={count >= maxQuota}
-          className="btn-cyber inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="btn-editorial inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Nueva Nota Cifrada</span>
@@ -102,31 +103,37 @@ export const VaultPage = () => {
       {/* Quota Bar */}
       <QuotaBar count={count} max={maxQuota} />
 
-      {/* Search Bar */}
-      <div className="glass-panel rounded-2xl px-4 py-3 flex items-center focus-within:border-emerald-500/60 transition-all animate-slide-up">
-        <Search className="w-4 h-4 text-emerald-400 mr-3 shrink-0" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar instantáneamente en títulos y notas descifradas en memoria..."
-          className="bg-transparent text-sm text-white placeholder-slate-400 focus:outline-none w-full"
-        />
-        {search && (
-          <button
-            onClick={() => setSearch('')}
-            className="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer"
-            title="Limpiar búsqueda"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
+      {/* Mobbin Pill Search & Counter Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+        <div className="relative flex-1 max-w-md flex items-center">
+          <Search className="w-4 h-4 text-[#878787] absolute left-4" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar en títulos y notas descifradas..."
+            className="w-full h-11 pl-10 pr-9 rounded-full bg-[#F4F4F5] border border-transparent focus:border-[#141414] focus:bg-white text-sm text-[#141414] placeholder-[#878787] focus:outline-none transition-all"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3.5 text-[#878787] hover:text-[#141414] cursor-pointer"
+              title="Limpiar búsqueda"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        <span className="text-xs sm:text-sm text-[#878787] font-medium">
+          Mostrando {filteredNotes.length} de {count} notas cifradas
+        </span>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="p-4 bg-rose-950/60 border border-rose-500/50 rounded-2xl text-rose-300 text-xs flex items-center gap-2.5 animate-slide-up">
-          <AlertOctagon className="w-4 h-4 shrink-0 text-rose-400" />
+        <div className="p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#B91C1C] text-xs font-semibold flex items-center gap-2">
+          <AlertOctagon className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -134,8 +141,8 @@ export const VaultPage = () => {
       {/* Loading */}
       {loading && (
         <div className="py-20 flex flex-col items-center justify-center space-y-3">
-          <Loader2 className="w-9 h-9 text-emerald-400 animate-spin" />
-          <p className="text-xs text-emerald-300/80 font-mono">Descifrando bóveda en memoria con AES-256-GCM...</p>
+          <Loader2 className="w-7 h-7 text-[#141414] animate-spin" />
+          <p className="text-xs text-[#666666] font-mono">Descifrando notas en memoria con clave simétrica...</p>
         </div>
       )}
 
@@ -143,30 +150,29 @@ export const VaultPage = () => {
       {!loading && (
         <>
           {filteredNotes.length === 0 ? (
-            <div className="text-center py-20 glass-panel rounded-3xl p-8 animate-slide-up">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 animate-float shadow-[0_0_25px_rgba(16,185,129,0.2)]">
-                <Lock className="w-7 h-7" />
+            <div className="text-center py-20 bg-[#F7F7F8] border border-[#E5E5E5] rounded-2xl p-8 animate-slide-up">
+              <div className="w-12 h-12 mx-auto rounded-full bg-white flex items-center justify-center text-[#141414] mb-3 border border-[#E5E5E5] shadow-2xs">
+                <FileText className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">
-                {search ? 'Sin coincidencias en tu bóveda' : 'Tu bóveda criptográfica está lista'}
+              <h3 className="text-base font-bold text-[#141414]">
+                {search ? 'Sin resultados para la búsqueda' : 'Tu bóveda se encuentra vacía'}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+              <p className="text-xs text-[#666666] max-w-sm mx-auto mt-1 leading-relaxed">
                 {search
-                  ? 'Prueba con otro término de búsqueda.'
-                  : 'Crea tu primera nota confidencial. Se cifrará con AES-256-GCM y vector de inicialización único antes de almacenarse.'}
+                  ? 'Intenta con otros términos clave.'
+                  : 'Crea tu primera nota confidencial. Será cifrada con AES-256-GCM antes de ser persistida.'}
               </p>
               {!search && (
                 <button
                   onClick={handleOpenCreate}
-                  className="btn-cyber mt-6 px-5 py-2.5 rounded-xl text-xs inline-flex items-center gap-2 cursor-pointer"
+                  className="btn-editorial mt-5 px-6 py-2.5 rounded-full text-xs cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Cifrar mi primera nota</span>
+                  + Cifrar mi primera nota
                 </button>
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredNotes.map((note) => (
                 <NoteCard
                   key={note.id}

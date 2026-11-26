@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ProtectedRoute from '../components/security/ProtectedRoute.jsx';
 
+import LandingPage from '../pages/LandingPage.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage.jsx';
@@ -15,20 +16,17 @@ export const AppRouter = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-3">
-        <div className="w-9 h-9 border-2 border-emerald-500/20 border-t-emerald-400 rounded-full animate-spin"></div>
-        <p className="text-xs text-emerald-300/80 font-mono tracking-wider">Inicializando SecureVault...</p>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-3 bg-white">
+        <div className="w-7 h-7 border-2 border-[#E5E5E5] border-t-[#141414] rounded-full animate-spin"></div>
+        <p className="text-xs text-[#666666] font-mono tracking-wider">Inicializando SecureVault...</p>
       </div>
     );
   }
 
   return (
     <Routes>
-      {/* Redirección inicial */}
-      <Route
-        path="/"
-        element={<Navigate to={isAuthenticated ? "/vault" : "/login"} replace />}
-      />
+      {/* Página Principal Estilo Mobbin Screen Browser */}
+      <Route path="/" element={<LandingPage />} />
 
       {/* Rutas Públicas */}
       <Route
@@ -62,17 +60,17 @@ export const AppRouter = () => {
         }
       />
 
-      {/* Ruta Protegida con RBAC de Administrador en Servidor (RF-07, RF-03) */}
+      {/* Ruta Protegida por Rol Administrador (RF-07, OWASP A01:2025) */}
       <Route
         path="/admin"
         element={
-          <ProtectedRoute requiredRole="admin">
+          <ProtectedRoute requireAdmin={true}>
             <AdminPage />
           </ProtectedRoute>
         }
       />
 
-      {/* Fallback de 404 */}
+      {/* Fallback 404 */}
       <Route
         path="*"
         element={<Navigate to="/" replace />}

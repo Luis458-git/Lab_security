@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import authService from '../services/auth.service.js';
 import PasswordStrength from '../components/security/PasswordStrength.jsx';
-import { ShieldCheck, Mail, Lock, ArrowLeft, Loader2, AlertOctagon, CheckCircle2, Hash, Inbox, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle, CheckCircle2, Inbox, Lock } from 'lucide-react';
 
 export const ForgotPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -19,7 +19,6 @@ export const ForgotPasswordPage = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Paso 1: Solicitar código OTP al correo
   const handleRequestReset = async (e) => {
     e.preventDefault();
     setError('');
@@ -37,7 +36,6 @@ export const ForgotPasswordPage = () => {
     }
   };
 
-  // Paso 2: Validar código OTP recibido por correo y actualizar contraseña
   const handleConfirmReset = async (e) => {
     e.preventDefault();
     setError('');
@@ -67,40 +65,38 @@ export const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-[82vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full glass-panel p-8 sm:p-10 rounded-3xl space-y-6 animate-slide-up relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
-        {/* Step Indicator */}
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F4F4F5] bg-dot-grid">
+      <div className="max-w-md w-full space-y-6 editorial-panel bg-white p-8 sm:p-10 rounded-2xl animate-slide-up">
+        {/* Step Pill Indicator */}
         <div className="flex items-center justify-center gap-2">
-          <div className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step === 1 ? 'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.6)]' : 'bg-emerald-500/40'}`}></div>
-          <div className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step === 2 ? 'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.6)]' : 'bg-white/10'}`}></div>
+          <div className={`h-1.5 w-10 rounded-full transition-all duration-300 ${step === 1 ? 'bg-[#141414]' : 'bg-[#D4D4D8]'}`}></div>
+          <div className={`h-1.5 w-10 rounded-full transition-all duration-300 ${step === 2 ? 'bg-[#141414]' : 'bg-[#E5E5E5]'}`}></div>
         </div>
 
         <div className="text-center">
-          <div className="mx-auto w-14 h-14 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center text-emerald-400 mb-4 shadow-[0_0_25px_rgba(16,185,129,0.25)] animate-float">
-            <ShieldCheck className="w-7 h-7 text-emerald-400" />
+          <div className="mx-auto w-12 h-12 rounded-[28%] bg-[#141414] text-white flex items-center justify-center mb-3 shadow-sm animate-float">
+            <Lock className="w-5 h-5" />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">
-            {step === 1 ? 'Recuperar Contraseña' : 'Verificar Código OTP'}
+          <h1 className="text-2xl font-bold tracking-tight text-[#141414]">
+            {step === 1 ? 'Recuperar Contraseña' : 'Validar Código OTP'}
           </h1>
-          <p className="mt-1.5 text-xs text-slate-400">
+          <p className="mt-1.5 text-xs text-[#666666]">
             {step === 1
-              ? 'Enviaremos un código criptográfico de 6 dígitos a tu correo electrónico'
-              : 'Ingresa los 6 dígitos recibidos en tu bandeja de entrada (expira en 10 min)'}
+              ? 'Se enviará un código de verificación seguro de 6 dígitos a tu correo'
+              : 'Ingresa el código OTP de 6 dígitos que enviamos a tu bandeja de entrada'}
           </p>
         </div>
 
         {error && (
-          <div className="p-3.5 bg-rose-950/60 border border-rose-500/50 rounded-xl text-rose-300 text-xs flex items-center gap-2.5 animate-slide-up">
-            <AlertOctagon className="w-4 h-4 shrink-0 text-rose-400" />
+          <div className="p-3.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl text-[#B91C1C] text-xs font-semibold flex items-center gap-2 animate-slide-up">
+            <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-3.5 bg-emerald-950/60 border border-emerald-500/50 rounded-xl text-emerald-300 text-xs font-medium flex items-center gap-2.5 animate-slide-up">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+          <div className="p-3.5 bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl text-[#15803d] text-xs font-semibold flex items-center gap-2 animate-slide-up">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
         )}
@@ -108,38 +104,32 @@ export const ForgotPasswordPage = () => {
         {step === 1 ? (
           <form className="space-y-4" onSubmit={handleRequestReset}>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-2">
+              <label className="block text-xs font-bold text-[#141414] mb-1.5 uppercase tracking-wider">
                 Correo Electrónico Registrado
               </label>
-              <div className="relative group">
-                <Mail className="w-4 h-4 text-slate-500 group-focus-within:text-emerald-400 transition-colors absolute left-3.5 top-3.5" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu-correo@ejemplo.com"
-                  className="input-cyber w-full rounded-xl pl-10 pr-4 py-3 text-sm placeholder-slate-500"
-                  disabled={loading}
-                />
-              </div>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu-correo@ejemplo.com"
+                className="input-editorial w-full rounded-xl px-4 py-3 text-sm"
+                disabled={loading}
+              />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-cyber w-full py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="btn-editorial w-full py-3.5 px-5 rounded-full text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Despachando código OTP...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Enviando código...</span>
                 </>
               ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Enviar Código a Mi Correo</span>
-                </>
+                <span>Enviar Código a Mi Correo</span>
               )}
             </button>
 
@@ -147,72 +137,66 @@ export const ForgotPasswordPage = () => {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="text-xs text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
+                className="text-xs font-semibold text-[#666666] hover:text-[#141414] transition-colors cursor-pointer"
               >
-                ¿Ya recibiste el código de 6 dígitos? Ingresar código →
+                ¿Ya recibiste el código? Ingresar código →
               </button>
             </div>
           </form>
         ) : (
           <form className="space-y-4 animate-slide-up" onSubmit={handleConfirmReset}>
-            <div className="p-3.5 bg-slate-900/90 border border-emerald-500/30 rounded-xl text-xs flex items-start gap-3 text-slate-300">
-              <Inbox className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="p-3.5 bg-[#F7F7F8] border border-[#E5E5E5] rounded-xl text-xs flex items-start gap-2.5 text-[#141414]">
+              <Inbox className="w-4 h-4 text-[#141414] shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-white">Revisa tu bandeja de entrada</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Busca el correo de <strong>SecureVault Security</strong>. El código es válido por 10 minutos.
+                <p className="font-bold text-[#141414]">Revisa tu bandeja de entrada</p>
+                <p className="text-[11px] text-[#666666] mt-0.5">
+                  El código expira en 10 minutos y es de un solo uso.
                 </p>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-2">
-                Código OTP de Seguridad (6 dígitos)
+              <label className="block text-xs font-bold text-[#141414] mb-1.5 uppercase tracking-wider">
+                Código OTP Recibido (6 dígitos)
               </label>
-              <div className="relative group">
-                <Hash className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3.5" />
-                <input
-                  type="text"
-                  required
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  placeholder="482910"
-                  maxLength={64}
-                  className="input-cyber w-full rounded-xl pl-10 pr-4 py-3 text-emerald-300 text-lg font-mono font-extrabold tracking-[0.35em] text-center"
-                  disabled={loading}
-                  autoComplete="one-time-code"
-                />
-              </div>
+              <input
+                type="text"
+                required
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="482910"
+                maxLength={64}
+                className="input-editorial w-full rounded-xl px-4 py-3 text-[#141414] text-lg font-mono font-extrabold tracking-[0.35em] text-center"
+                disabled={loading}
+                autoComplete="one-time-code"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-2">
+              <label className="block text-xs font-bold text-[#141414] mb-1.5 uppercase tracking-wider">
                 Nueva Contraseña Maestra
               </label>
-              <div className="relative group">
-                <Lock className="w-4 h-4 text-slate-500 group-focus-within:text-emerald-400 transition-colors absolute left-3.5 top-3.5" />
-                <input
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Mínimo 12 caracteres complejos"
-                  className="input-cyber w-full rounded-xl pl-10 pr-4 py-3 text-sm placeholder-slate-500 font-mono"
-                  disabled={loading}
-                />
-              </div>
+              <input
+                type="password"
+                required
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Mínimo 12 caracteres complejos"
+                className="input-editorial w-full rounded-xl px-4 py-3 text-sm font-mono"
+                disabled={loading}
+              />
               <PasswordStrength password={newPassword} />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-cyber w-full py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="btn-editorial w-full py-3.5 px-5 rounded-full text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Validando y Actualizando...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Validando y Cambiando...</span>
                 </>
               ) : (
                 <span>Confirmar y Cambiar Contraseña</span>
@@ -223,17 +207,17 @@ export const ForgotPasswordPage = () => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-xs text-slate-400 hover:text-emerald-400 transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer"
+                className="text-xs font-semibold text-[#666666] hover:text-[#141414] transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>¿No te llegó? Solicitar un nuevo código</span>
+                <span>Solicitar otro código</span>
               </button>
             </div>
           </form>
         )}
 
-        <div className="text-center text-xs text-slate-400 pt-4 border-t border-white/10">
-          <Link to="/login" className="text-emerald-400 hover:text-emerald-300 font-semibold hover:underline">
+        <div className="text-center text-xs text-[#666666] pt-4 border-t border-[#E5E5E5]">
+          <Link to="/login" className="text-[#141414] font-bold hover:underline">
             ← Volver al inicio de sesión
           </Link>
         </div>

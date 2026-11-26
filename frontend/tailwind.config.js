@@ -4,20 +4,33 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        vault: {
-          bg: '#060913',
-          card: '#0d1323',
-          surface: '#131c31',
-          border: '#1e293b',
-          borderHover: '#334155',
-          emerald: '#10b981',
-          cyan: '#06b6d4',
-          amber: '#f59e0b',
-          red: '#f43f5e'
+        mobbin: {
+          bg: '#FFFFFF',
+          surface: '#F7F7F8',
+          surfaceSubtle: '#FAFAFA',
+          surfaceHover: '#EFEFF1',
+          border: '#E5E5E5',
+          borderHover: '#CCCCCC',
+          borderActive: '#111111',
+          text: '#111111',
+          muted: '#666666',
+          subtle: '#999999',
+          dark: '#111111',
+          darkHover: '#262626'
+        },
+        status: {
+          success: '#15803d',
+          successBg: '#f0fdf4',
+          successBorder: '#bbf7d0',
+          warning: '#b45309',
+          warningBg: '#fffbeb',
+          warningBorder: '#fde68a',
+          danger: '#b91c1c',
+          dangerBg: '#fef2f2',
+          dangerBorder: '#fecaca'
         }
       },
       fontFamily: {

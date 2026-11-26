@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { Shield, FileText, User, LogOut, ShieldAlert, Sparkles, ArrowRight } from 'lucide-react';
+import { Search, LogOut, ArrowRight } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -16,86 +16,106 @@ export const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-40 bg-[#060913]/80 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand / Logo con efecto glow */}
-        <Link to="/" className="flex items-center space-x-3 group">
-          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.25)] group-hover:scale-105 group-hover:shadow-[0_0_25px_rgba(16,185,129,0.45)] transition-all duration-300">
-            <Shield className="w-5 h-5 text-emerald-400 group-hover:rotate-6 transition-transform duration-300" />
-          </div>
-          <div className="flex items-center space-x-2.5">
-            <span className="text-lg font-extrabold tracking-tight text-white font-sans group-hover:text-emerald-300 transition-colors">
-              Secure<span className="text-gradient-emerald">Vault</span>
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E5E5] h-16 flex items-center">
+      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 flex items-center justify-between gap-4">
+        {/* Left: Geometric Brand Mark & Primary Text Links (Mobbin Pattern) */}
+        <div className="flex items-center space-x-6">
+          <Link to="/" className="flex items-center space-x-2.5 group">
+            <div className="w-8 h-8 rounded-[26%] bg-[#141414] text-white flex items-center justify-center font-extrabold text-xs tracking-tighter group-hover:scale-105 transition-transform">
+              SV
+            </div>
+            <span className="text-base font-bold tracking-tight text-[#141414]">
+              SecureVault
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 font-mono font-medium shadow-inner">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-              </span>
-              AES-256-GCM
-            </span>
-          </div>
-        </Link>
+          </Link>
 
-        {/* Navigation Actions */}
-        <nav className="flex items-center space-x-2 sm:space-x-2.5">
+          <nav className="hidden md:flex items-center space-x-5">
+            <Link
+              to="/"
+              className={`text-sm font-semibold transition-colors ${
+                isActive('/') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+              }`}
+            >
+              Explorar
+            </Link>
+
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/vault"
+                  className={`text-sm font-semibold transition-colors ${
+                    isActive('/vault') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+                  }`}
+                >
+                  Bóveda
+                </Link>
+                <Link
+                  to="/profile"
+                  className={`text-sm font-semibold transition-colors ${
+                    isActive('/profile') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+                  }`}
+                >
+                  Perfil PII
+                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className={`text-sm font-semibold transition-colors ${
+                      isActive('/admin') ? 'text-[#141414]' : 'text-[#878787] hover:text-[#141414]'
+                    }`}
+                  >
+                    SecOps
+                  </Link>
+                )}
+              </>
+            )}
+          </nav>
+        </div>
+
+        {/* Center: Mobbin Pill Search Trigger */}
+        <div
+          onClick={() => navigate(isAuthenticated ? '/vault' : '/')}
+          className="hidden lg:flex items-center w-80 xl:w-96 h-10 px-4 rounded-full bg-[#F4F4F5] hover:bg-[#EFEFF1] border border-transparent hover:border-[#E5E5E5] text-xs text-[#878787] cursor-pointer transition-all"
+        >
+          <Search className="w-3.5 h-3.5 mr-2.5 text-[#878787]" />
+          <span>Buscar en pantallas y notas cifradas...</span>
+          <span className="ml-auto text-[10px] font-mono bg-white px-2 py-0.5 rounded-full border border-[#E5E5E5] text-[#666666]">
+            AES-256
+          </span>
+        </div>
+
+        {/* Right: Pill Buttons & User Avatar */}
+        <div className="flex items-center space-x-2.5">
           {isAuthenticated ? (
             <>
               <Link
                 to="/vault"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                  isActive('/vault')
-                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'
+                className={`md:hidden px-3 py-1.5 rounded-full text-xs font-semibold ${
+                  isActive('/vault') ? 'bg-[#141414] text-white' : 'bg-[#F4F4F5] text-[#141414]'
                 }`}
               >
-                <FileText className="w-4 h-4" />
-                <span>Bóveda</span>
+                Bóveda
               </Link>
 
               <Link
                 to="/profile"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                  isActive('/profile')
-                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'
-                }`}
+                className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-[#F4F4F5] hover:bg-[#EFEFF1] border border-[#E5E5E5] transition-colors"
+                title="Ver perfil de seguridad"
               >
-                <User className="w-4 h-4" />
-                <span>Perfil</span>
-              </Link>
-
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                    isActive('/admin')
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.25)]'
-                      : 'text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10 border border-cyan-500/20'
-                  }`}
-                >
-                  <ShieldAlert className="w-4 h-4 text-cyan-400" />
-                  <span>SecOps</span>
-                </Link>
-              )}
-
-              <div className="h-5 w-px bg-white/10 mx-1 hidden sm:block"></div>
-
-              <div className="hidden md:flex flex-col items-end text-xs pr-1">
-                <span className="text-slate-200 font-semibold truncate max-w-[140px]">
+                <div className="w-6 h-6 rounded-full bg-[#141414] text-white text-[11px] font-bold flex items-center justify-center font-mono">
+                  {(user.fullName || user.email || 'U').charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:inline text-xs font-semibold text-[#141414] truncate max-w-[120px]">
                   {user.fullName || user.email}
                 </span>
-                <span className="text-emerald-400/80 text-[10px] font-mono uppercase tracking-wider">
-                  {user.role}
-                </span>
-              </div>
+              </Link>
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/30 transition-all duration-200 cursor-pointer"
-                title="Cerrar sesión de forma segura"
+                className="h-9 px-3.5 rounded-full bg-white hover:bg-[#FEF2F2] text-[#666666] hover:text-[#B91C1C] border border-[#E5E5E5] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Cerrar sesión"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Salir</span>
               </button>
             </>
@@ -103,25 +123,20 @@ export const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                  isActive('/login')
-                    ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                className="h-9 px-4 rounded-full text-xs sm:text-sm font-semibold text-[#666666] hover:text-[#141414] flex items-center transition-colors"
               >
                 Iniciar Sesión
               </Link>
               <Link
                 to="/register"
-                className="btn-cyber inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm"
+                className="btn-editorial h-9 px-4 rounded-full text-xs sm:text-sm inline-flex items-center gap-1.5"
               >
-                <Sparkles className="w-3.5 h-3.5" />
                 <span>Crear Bóveda</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>
           )}
-        </nav>
+        </div>
       </div>
     </header>
   );
