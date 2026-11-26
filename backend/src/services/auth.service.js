@@ -233,8 +233,12 @@ export const requestPasswordReset = async (email, clientIp, userAgent) => {
       details: { email: user.email }
     });
 
-    // Despachar correo electrónico real vía SMTP con el código OTP
-    await sendPasswordResetEmail(user.email, otp, user.phone_number_masked);
+    // Despachar correo electrónico real vía SMTP con el código OTP de forma no bloqueante
+    // Esto garantiza respuesta inmediata al usuario en UI sin congelar la pantalla
+    sendPasswordResetEmail(user.email, otp, user.phone_number_masked).catch((err) => {
+      // Registrar en log forense si hay falla de transporte SMTP
+      console.error('Error al despachar correo de restablecimiento:', err.message);
+    });
   }
 
   // Respuesta homogénea para mitigar enumeración de correos (OWASP A07)

@@ -11,15 +11,35 @@ const getTransporter = () => {
   if (transporter) return transporter;
 
   if (env.SMTP_USER && env.SMTP_PASS) {
-    transporter = nodemailer.createTransport({
-      host: env.SMTP_HOST || 'smtp.gmail.com',
-      port: Number(env.SMTP_PORT) || 587,
-      secure: env.SMTP_SECURE === true || env.SMTP_PORT === 465,
-      auth: {
-        user: env.SMTP_USER,
-        pass: env.SMTP_PASS
-      }
-    });
+    const cleanUser = env.SMTP_USER.trim();
+    const cleanPass = env.SMTP_PASS.replace(/\s+/g, '');
+
+    // Si es Gmail, usar el preset 'gmail' optimizado de nodemailer
+    if (cleanUser.endsWith('@gmail.com') || (env.SMTP_HOST && env.SMTP_HOST.includes('gmail'))) {
+      transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: cleanUser,
+          pass: cleanPass
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 5000,
+        socketTimeout: 10000
+      });
+    } else {
+      transporter = nodemailer.createTransport({
+        host: env.SMTP_HOST || 'smtp.gmail.com',
+        port: Number(env.SMTP_PORT) || 587,
+        secure: env.SMTP_SECURE === true || env.SMTP_PORT === 465,
+        auth: {
+          user: cleanUser,
+          pass: cleanPass
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 5000,
+        socketTimeout: 10000
+      });
+    }
   }
 
   return transporter;
