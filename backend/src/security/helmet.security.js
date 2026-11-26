@@ -61,7 +61,7 @@ export const configureHelmet = () => {
 };
 
 /**
- * Middleware para la cabecera Permissions-Policy (reemplazo moderno de Feature-Policy).
+ * Middleware para la cabecera Permissions-Policy (y retrocompatibilidad con Feature-Policy).
  * Restringe el acceso a APIs sensibles del navegador (cámara, micrófono, geolocalización, etc.)
  * para alcanzar la calificación máxima A+ en auditorías de seguridad (SecurityHeaders.com).
  */
@@ -69,7 +69,11 @@ export const configurePermissionsPolicy = () => {
   return (req, res, next) => {
     res.setHeader(
       'Permissions-Policy',
-      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=()'
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()'
+    );
+    res.setHeader(
+      'Feature-Policy',
+      "camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'; usb 'none'"
     );
     next();
   };

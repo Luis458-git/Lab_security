@@ -45,13 +45,32 @@ app.use(routes);
 
 // Servir frontend compilado de React (frontend/dist)
 const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
-app.use(express.static(frontendDistPath));
+app.use(express.static(frontendDistPath, {
+  setHeaders: (res) => {
+    res.setHeader(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()'
+    );
+    res.setHeader(
+      'Feature-Policy',
+      "camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'; usb 'none'"
+    );
+  }
+}));
 
 // Cualquier ruta que NO empiece por /api ni /health devuelve index.html (React Router)
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api') || req.path === '/health') {
     return next();
   }
+  res.setHeader(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=(), usb=(), screen-wake-lock=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()'
+  );
+  res.setHeader(
+    'Feature-Policy',
+    "camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'; usb 'none'"
+  );
   res.sendFile(path.join(frontendDistPath, 'index.html'));
 });
 
