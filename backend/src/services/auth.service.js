@@ -237,12 +237,10 @@ export const requestPasswordReset = async (email, clientIp, userAgent) => {
     await sendPasswordResetEmail(user.email, otp, user.phone_number_masked);
   }
 
-  // Respuesta homogénea para mitigar enumeración de correos
+  // Respuesta homogénea para mitigar enumeración de correos (OWASP A07)
+  // El código OTP NUNCA se expone en la respuesta HTTP: viaja estrictamente por correo
   return {
-    message: 'Si el correo electrónico está registrado, recibirás un código OTP de seguridad de 6 dígitos para restablecer tu contraseña.',
-    // Proveemos devOtp y devToken si estamos en laboratorio o sin SMTP configurado para agilizar pruebas
-    devOtp: (!env.SMTP_USER || env.NODE_ENV !== 'production') ? otp : undefined,
-    devToken: (!env.SMTP_USER || env.NODE_ENV !== 'production') ? otp : undefined
+    message: 'Si el correo electrónico está registrado, recibirás un código OTP de seguridad de 6 dígitos en tu bandeja de entrada.'
   };
 };
 

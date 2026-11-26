@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import authService from '../services/auth.service.js';
 import PasswordStrength from '../components/security/PasswordStrength.jsx';
-import { ShieldCheck, Mail, Lock, Copy, Check, ArrowLeft, Loader2, AlertOctagon, CheckCircle2, Hash } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, ArrowLeft, Loader2, AlertOctagon, CheckCircle2, Hash, Inbox } from 'lucide-react';
 
 export const ForgotPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -18,10 +18,8 @@ export const ForgotPasswordPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const [devTokenNotice, setDevTokenNotice] = useState('');
-  const [copied, setCopied] = useState(false);
 
-  // Paso 1: Solicitar código OTP
+  // Paso 1: Solicitar código OTP al correo
   const handleRequestReset = async (e) => {
     e.preventDefault();
     setError('');
@@ -30,12 +28,7 @@ export const ForgotPasswordPage = () => {
 
     try {
       const res = await authService.forgotPassword(email);
-      setSuccess(res.message);
-      const code = res.devOtp || res.devToken;
-      if (code) {
-        setDevTokenNotice(code);
-        setToken(code);
-      }
+      setSuccess(res.message || 'Código enviado. Revisa tu bandeja de entrada o carpeta de spam.');
       setStep(2);
     } catch (err) {
       setError(err.message || 'Error al procesar la solicitud');
@@ -44,7 +37,7 @@ export const ForgotPasswordPage = () => {
     }
   };
 
-  // Paso 2: Validar código OTP y actualizar contraseña
+  // Paso 2: Validar código OTP recibido por correo y actualizar contraseña
   const handleConfirmReset = async (e) => {
     e.preventDefault();
     setError('');
@@ -73,12 +66,6 @@ export const ForgotPasswordPage = () => {
     }
   };
 
-  const handleCopyDevToken = () => {
-    navigator.clipboard.writeText(devTokenNotice);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-6 bg-vault-card border border-vault-border p-8 rounded-2xl shadow-xl transition-surface">
@@ -87,12 +74,12 @@ export const ForgotPasswordPage = () => {
             <ShieldCheck className="w-6 h-6 text-vault-emerald" />
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-white font-sans">
-            {step === 1 ? 'Recuperación de Contraseña' : 'Verificación OTP'}
+            {step === 1 ? 'Recuperar Contraseña' : 'Validar Código de Correo'}
           </h2>
           <p className="mt-1 text-xs text-gray-400">
             {step === 1
-              ? 'Código OTP de 6 dígitos seguro (NIST SP 800-63B / Expira en 10 min)'
-              : 'Ingresa el código OTP recibido en tu correo para restablecer la contraseña'}
+              ? 'Se enviará un código de verificación OTP a tu correo electrónico'
+              : 'Ingresa el código OTP de 6 dígitos que enviamos a tu bandeja de entrada'}
           </p>
         </div>
 
@@ -107,31 +94,6 @@ export const ForgotPasswordPage = () => {
           <div className="p-3.5 bg-emerald-950/40 border border-emerald-900/60 rounded-xl text-vault-emerald text-xs font-medium flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{success}</span>
-          </div>
-        )}
-
-        {/* Notificación con código OTP para pruebas de laboratorio / entorno sin SMTP */}
-        {devTokenNotice && (
-          <div className="p-4 bg-emerald-950/30 border border-vault-emerald/50 rounded-xl text-xs space-y-2 animate-fade-in">
-            <div className="flex items-center justify-between text-vault-emerald font-semibold">
-              <span className="flex items-center gap-1.5">
-                <span>🔐</span> Código OTP de Seguridad:
-              </span>
-              <button
-                type="button"
-                onClick={handleCopyDevToken}
-                className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded bg-vault-emerald text-vault-bg font-bold hover:bg-emerald-400 transition-colors shadow-sm"
-              >
-                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                <span>{copied ? '¡Copiado!' : 'Copiar Código'}</span>
-              </button>
-            </div>
-            <div className="bg-vault-bg p-3 rounded-lg border border-vault-border text-center font-mono text-xl font-extrabold tracking-[6px] text-vault-emerald select-all">
-              {devTokenNotice}
-            </div>
-            <p className="text-[11px] text-gray-400 text-center">
-              Válido durante 10 minutos para un solo uso.
-            </p>
           </div>
         )}
 
@@ -163,10 +125,10 @@ export const ForgotPasswordPage = () => {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Generando Código OTP...</span>
+                  <span>Enviando código al correo...</span>
                 </>
               ) : (
-                <span>Enviar Código OTP de Recuperación</span>
+                <span>Enviar Código a Mi Correo</span>
               )}
             </button>
 
@@ -176,15 +138,25 @@ export const ForgotPasswordPage = () => {
                 onClick={() => setStep(2)}
                 className="text-xs text-gray-400 hover:text-vault-emerald transition-colors"
               >
-                ¿Ya tienes tu código OTP de 6 dígitos? Ingresar código →
+                ¿Ya recibiste el código en tu correo? Ingresar código →
               </button>
             </div>
           </form>
         ) : (
           <form className="space-y-4" onSubmit={handleConfirmReset}>
+            <div className="p-3 bg-vault-surface/60 border border-vault-border rounded-xl text-xs flex items-start gap-2.5 text-gray-300">
+              <Inbox className="w-4 h-4 text-vault-emerald shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-gray-200">Revisa tu correo</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Búscalo en tu bandeja principal o en la carpeta de <strong>spam / correo no deseado</strong>. El código expira en 10 minutos.
+                </p>
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-medium text-gray-300 mb-1">
-                Código OTP de Seguridad (6 dígitos)
+                Código OTP Recibido (6 dígitos)
               </label>
               <div className="relative">
                 <Hash className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
@@ -195,19 +167,16 @@ export const ForgotPasswordPage = () => {
                   onChange={(e) => setToken(e.target.value)}
                   placeholder="Ej: 482910"
                   maxLength={64}
-                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-base font-mono font-bold tracking-widest transition-colors"
+                  className="w-full bg-vault-bg border border-vault-border rounded-lg pl-10 pr-3.5 py-2.5 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-vault-emerald text-base font-mono font-bold tracking-widest transition-colors text-center"
                   disabled={loading}
                   autoComplete="one-time-code"
                 />
               </div>
-              <p className="text-[11px] text-gray-500 mt-1">
-                Código efímero de 6 dígitos enviado a tu correo electrónico.
-              </p>
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-300 mb-1">
-                Nueva Contraseña Maestra
+                Nueva Contraseña
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
@@ -232,10 +201,10 @@ export const ForgotPasswordPage = () => {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Validando OTP y Actualizando...</span>
+                  <span>Validando y Cambiando Contraseña...</span>
                 </>
               ) : (
-                <span>Confirmar Código y Restablecer Contraseña</span>
+                <span>Confirmar y Cambiar Contraseña</span>
               )}
             </button>
 
@@ -246,7 +215,7 @@ export const ForgotPasswordPage = () => {
                 className="text-xs text-gray-400 hover:text-vault-emerald transition-colors flex items-center justify-center gap-1 mx-auto"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Volver al Paso 1 (Solicitar otro código)</span>
+                <span>¿No te llegó? Solicitar otro código</span>
               </button>
             </div>
           </form>
