@@ -11,9 +11,9 @@
 }
 
 @layer base {
-  body {
-    background-color: #FFFFFF;
-    color: #111111;
+  html, body {
+    background-color: #FFFFFF !important;
+    color: #111111 !important;
     min-height: 100vh;
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -31,9 +31,61 @@
   }
 }
 
+/* Utilidades explícitas del sistema de diseño Mobbin (garantiza HMR instantáneo) */
+.bg-mobbin-bg { background-color: #FFFFFF !important; }
+.bg-mobbin-surface { background-color: #F7F7F8 !important; }
+.bg-mobbin-surfaceSubtle { background-color: #FAFAFA !important; }
+.bg-mobbin-surfaceHover { background-color: #F0F0F2 !important; }
+.bg-mobbin-dark { background-color: #111111 !important; }
+.bg-mobbin-darkHover { background-color: #262626 !important; }
+.bg-mobbin-border { background-color: #E5E5E5 !important; }
+.bg-mobbin-subtle { background-color: #8E8E93 !important; }
+
+.hover\:bg-mobbin-surface:hover { background-color: #F7F7F8 !important; }
+.hover\:bg-mobbin-surface\/50:hover { background-color: rgba(247, 247, 248, 0.5) !important; }
+.hover\:bg-mobbin-surface\/60:hover { background-color: rgba(247, 247, 248, 0.6) !important; }
+.hover\:bg-mobbin-surface\/70:hover { background-color: rgba(247, 247, 248, 0.7) !important; }
+.hover\:bg-mobbin-surfaceHover:hover { background-color: #F0F0F2 !important; }
+.hover\:bg-mobbin-darkHover:hover { background-color: #262626 !important; }
+
+.text-mobbin-text { color: #111111 !important; }
+.text-mobbin-muted { color: #666666 !important; }
+.text-mobbin-subtle { color: #8E8E93 !important; }
+.text-mobbin-dark { color: #111111 !important; }
+.hover\:text-mobbin-text:hover { color: #111111 !important; }
+.placeholder-mobbin-subtle::placeholder { color: #8E8E93 !important; }
+
+.border-mobbin-border { border-color: #E5E5E5 !important; }
+.border-mobbin-borderHover { border-color: #D4D4D8 !important; }
+.border-mobbin-borderActive { border-color: #111111 !important; }
+.border-mobbin-dark { border-color: #111111 !important; }
+.border-t-mobbin-dark { border-top-color: #111111 !important; }
+.hover\:border-mobbin-borderHover:hover { border-color: #D4D4D8 !important; }
+.focus\:border-mobbin-borderActive:focus { border-color: #111111 !important; }
+.focus-within\:border-mobbin-borderActive:focus-within { border-color: #111111 !important; }
+.divide-mobbin-border > :not([hidden]) ~ :not([hidden]) { border-color: #E5E5E5 !important; }
+
+/* Estados semánticos discretos */
+.bg-status-success { background-color: #15803d !important; }
+.bg-status-successBg { background-color: #f0fdf4 !important; }
+.border-status-successBorder { border-color: #bbf7d0 !important; }
+.text-status-success { color: #15803d !important; }
+
+.bg-status-warning { background-color: #b45309 !important; }
+.bg-status-warningBg { background-color: #fffbeb !important; }
+.border-status-warningBorder { border-color: #fde68a !important; }
+.text-status-warning { color: #b45309 !important; }
+
+.bg-status-danger { background-color: #b91c1c !important; }
+.bg-status-dangerBg { background-color: #fef2f2 !important; }
+.border-status-dangerBorder { border-color: #fecaca !important; }
+.text-status-danger { color: #b91c1c !important; }
+.hover\:bg-status-dangerBg:hover { background-color: #fef2f2 !important; }
+.hover\:text-status-danger:hover { color: #b91c1c !important; }
+
 /* Patrón de cuadrícula editorial estilo Mobbin */
 .bg-dot-grid {
-  background-image: radial-gradient(#E5E5E5 1px, transparent 1px);
+  background-image: radial-gradient(#D4D4D8 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
