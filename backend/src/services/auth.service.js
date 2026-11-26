@@ -4,6 +4,7 @@ import env from '../config/env.js';
 import { hashPassword, verifyPassword, generateSecureToken, hashToken } from '../security/hash.security.js';
 import { encrypt } from '../security/crypto.security.js';
 import { logSecurityEvent } from '../utils/audit.util.js';
+import { sendPasswordResetEmail } from './email.service.js';
 
 // Helper para crear máscara de teléfono (***-***-1234)
 const maskPhoneNumber = (phone) => {
@@ -231,13 +232,16 @@ export const requestPasswordReset = async (email, clientIp, userAgent) => {
       userAgent,
       details: { email: user.email }
     });
+
+    // Despachar correo electrónico real vía SMTP (o emular si no hay credenciales)
+    await sendPasswordResetEmail(user.email, resetToken);
   }
 
   // Respuesta homogénea para mitigar enumeración de correos
   return {
     message: 'Si el correo electrónico está registrado, recibirás un enlace seguro para restablecer tu contraseña.',
-    // En entorno de laboratorio/desarrollo devolvemos el resetToken para facilitar la prueba
-    devToken: env.NODE_ENV !== 'production' ? resetToken : undefined
+    // Si no se ha configurado SMTP o estamos en desarrollo/pruebas, proveemos el devToken para facilitar la prueba
+    devToken: (!env.SMTP_USER || env.NODE_ENV !== 'production') ? resetToken : undefined
   };
 };
 

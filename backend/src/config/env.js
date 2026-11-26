@@ -29,7 +29,14 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32, { message: 'JWT_SECRET debe tener al menos 32 caracteres para resistencia criptográfica' }),
   COOKIE_SECRET: z.string().min(32, { message: 'COOKIE_SECRET debe tener al menos 32 caracteres' }),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info')
+  LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
+  SMTP_HOST: z.string().default('smtp.gmail.com').optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587).optional(),
+  SMTP_SECURE: z.coerce.boolean().default(false).optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().default('"SecureVault Security" <no-reply@securevault.com>').optional(),
+  APP_URL: z.string().default('https://securevault-adn6.onrender.com').optional()
 });
 
 const parseEnv = () => {
