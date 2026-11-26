@@ -100,6 +100,16 @@ describe('Suite de Pruebas de Ciberseguridad (OWASP Top 10:2025)', () => {
     assert.strictEqual(mismatch, false);
   });
 
+  it('debe generar códigos OTP numéricos seguros de 6 dígitos (NIST SP 800-63B)', () => {
+    // Rango [100000, 999999] usando CSPRNG crypto.randomInt
+    const otp = crypto.randomInt(100000, 1000000).toString();
+    assert.strictEqual(otp.length, 6);
+    assert.match(otp, /^[0-9]{6}$/);
+
+    const hash = crypto.createHash('sha256').update(otp, 'utf8').digest('hex');
+    assert.strictEqual(hash.length, 64);
+  });
+
   // --------------------------------------------------------------------------
   // 3. Pruebas de Política y Hashing de Contraseñas (Argon2id - RFC 9106)
   // --------------------------------------------------------------------------

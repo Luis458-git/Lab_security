@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { query } from '../config/db.js';
 import env from '../config/env.js';
-import { hashPassword, verifyPassword, generateSecureToken, hashToken } from '../security/hash.security.js';
+import { hashPassword, verifyPassword, generateSecureToken, generateSecureOTP, hashToken } from '../security/hash.security.js';
 import { encrypt } from '../security/crypto.security.js';
 import { logSecurityEvent } from '../utils/audit.util.js';
 import { sendPasswordResetEmail } from './email.service.js';
@@ -197,26 +197,26 @@ export const loginUser = async ({ email, password }, clientIp, userAgent) => {
 };
 
 /**
- * Solicitar restablecimiento de contraseña (RF-06)
- * Genera token de 32 bytes criptográfico, almacena solo su hash SHA-256 (15 min)
+ * Solicitar restablecimiento de contraseña (RF-06 / NIST SP 800-63B)
+ * Genera código OTP criptográfico de 6 dígitos, almacena solo su hash SHA-256 (10 min)
  */
 export const requestPasswordReset = async (email, clientIp, userAgent) => {
-  const userResult = await query('SELECT id, email FROM users WHERE email = $1', [email]);
+  const userResult = await query('SELECT id, email, phone_number_masked FROM users WHERE email = $1', [email]);
 
-  let resetToken = null;
+  let otp = null;
 
   if (userResult.rowCount > 0) {
     const user = userResult.rows[0];
 
-    // Generar token criptográficamente seguro (32 bytes = 64 hex chars)
-    resetToken = generateSecureToken(32);
-    // Hash irreversible con SHA-256 para persistir en BD
-    const tokenHash = hashToken(resetToken);
+    // Generar código OTP criptográficamente seguro de 6 dígitos (NIST SP 800-63B)
+    otp = generateSecureOTP();
+    // Hash irreversible con SHA-256 para persistir en BD sin exponer el OTP
+    const tokenHash = hashToken(otp);
 
-    // Expiración estricta a los 15 minutos
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    // Expiración estricta a los 10 minutos recomendada para códigos OTP
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Invalidar tokens previos no usados
+    // Invalidar códigos o tokens previos no usados
     await query('DELETE FROM password_resets WHERE user_id = $1', [user.id]);
 
     await query(
@@ -233,26 +233,29 @@ export const requestPasswordReset = async (email, clientIp, userAgent) => {
       details: { email: user.email }
     });
 
-    // Despachar correo electrónico real vía SMTP (o emular si no hay credenciales)
-    await sendPasswordResetEmail(user.email, resetToken);
+    // Despachar correo electrónico real vía SMTP con el código OTP
+    await sendPasswordResetEmail(user.email, otp, user.phone_number_masked);
   }
 
   // Respuesta homogénea para mitigar enumeración de correos
   return {
-    message: 'Si el correo electrónico está registrado, recibirás un enlace seguro para restablecer tu contraseña.',
-    // Si no se ha configurado SMTP o estamos en desarrollo/pruebas, proveemos el devToken para facilitar la prueba
-    devToken: (!env.SMTP_USER || env.NODE_ENV !== 'production') ? resetToken : undefined
+    message: 'Si el correo electrónico está registrado, recibirás un código OTP de seguridad de 6 dígitos para restablecer tu contraseña.',
+    // Proveemos devOtp y devToken si estamos en laboratorio o sin SMTP configurado para agilizar pruebas
+    devOtp: (!env.SMTP_USER || env.NODE_ENV !== 'production') ? otp : undefined,
+    devToken: (!env.SMTP_USER || env.NODE_ENV !== 'production') ? otp : undefined
   };
 };
 
 /**
- * Confirmar restablecimiento de contraseña con token de un solo uso
+ * Confirmar restablecimiento de contraseña con código OTP o token de un solo uso
  */
 export const resetPasswordWithToken = async ({ token, newPassword }, clientIp, userAgent) => {
-  // 1. Hashear el token recibido con SHA-256
-  const tokenHash = hashToken(token);
+  const cleanToken = (token || '').trim();
 
-  // 2. Buscar token válido, no usado y no expirado
+  // 1. Hashear el código OTP o token recibido con SHA-256
+  const tokenHash = hashToken(cleanToken);
+
+  // 2. Buscar registro válido, no usado y no expirado
   const tokenResult = await query(
     'SELECT id, user_id, expires_at, used FROM password_resets WHERE token_hash = $1',
     [tokenHash]
@@ -267,7 +270,7 @@ export const resetPasswordWithToken = async ({ token, newPassword }, clientIp, u
       userAgent,
       details: { reason: 'TOKEN_NOT_FOUND' }
     });
-    const error = new Error('El token de restablecimiento es inválido o no existe');
+    const error = new Error('El código OTP o token de restablecimiento es inválido');
     error.statusCode = 400;
     throw error;
   }
@@ -283,7 +286,7 @@ export const resetPasswordWithToken = async ({ token, newPassword }, clientIp, u
       userAgent,
       details: { reason: resetRecord.used ? 'TOKEN_ALREADY_USED' : 'TOKEN_EXPIRED' }
     });
-    const error = new Error('El token de restablecimiento ha expirado o ya fue utilizado');
+    const error = new Error('El código OTP ha expirado (10 min) o ya fue utilizado');
     error.statusCode = 400;
     throw error;
   }

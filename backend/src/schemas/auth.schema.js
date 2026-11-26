@@ -64,10 +64,17 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   token: z
-    .string({ required_error: 'El token de recuperación es requerido' })
-    .length(64, 'El token debe tener exactamente 64 caracteres hexadecimales')
-    .regex(/^[0-9a-fA-F]{64}$/, 'Formato de token hexadecimal inválido'),
-  newPassword: passwordValidation
+    .string({ required_error: 'El código OTP o token de recuperación es requerido' })
+    .transform((val) => val.trim())
+    .refine((val) => /^[0-9]{6}$/.test(val) || /^[0-9a-fA-F]{64}$/.test(val), {
+      message: 'Debe ser un código OTP de 6 dígitos numéricos o un token de 64 caracteres'
+    }),
+  newPassword: passwordValidation,
+  email: z
+    .string()
+    .email('Formato de correo electrónico inválido')
+    .transform((val) => val.toLowerCase().trim())
+    .optional()
 });
 
 export default {

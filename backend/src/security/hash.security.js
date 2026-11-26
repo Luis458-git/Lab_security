@@ -48,6 +48,16 @@ export const verifyPassword = async (hash, plainPassword) => {
 };
 
 /**
+ * Genera un código OTP numérico criptográficamente seguro de 6 dígitos (CSPRNG).
+ * Cumple con NIST SP 800-63B para autenticación de un solo uso.
+ * 
+ * @returns {string} Código numérico de 6 dígitos (ej. "482019")
+ */
+export const generateSecureOTP = () => {
+  return crypto.randomInt(100000, 1000000).toString();
+};
+
+/**
  * Genera un token aleatorio criptográficamente seguro (CSPRNG) para flujos
  * de un solo uso como restablecimiento de contraseña.
  * 
@@ -95,6 +105,7 @@ export default {
   hashPassword,
   verifyPassword,
   generateSecureToken,
+  generateSecureOTP,
   hashToken,
   safeCompare
 };
