@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, ShieldCheck, Loader2 } from 'lucide-react';
+import { Lock, X, Save, ShieldCheck, Loader2 } from 'lucide-react';
 
 const MAX_TITLE_LENGTH = 150;
 const MAX_CONTENT_LENGTH = 2000;
@@ -59,42 +59,44 @@ export const NoteModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-      <div className="bg-white border border-mobbin-border rounded-2xl w-full max-w-lg shadow-xl overflow-hidden flex flex-col transition-surface">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div className="glass-panel rounded-3xl w-full max-w-lg overflow-hidden flex flex-col animate-modal-in border border-emerald-500/30">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-mobbin-border flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-mobbin-text">
-              {initialData ? 'Editar Nota Cifrada' : 'Nueva Nota en la Bóveda'}
-            </h2>
-            <p className="text-[11px] text-mobbin-muted">
-              Cifrado simétrico AES-256-GCM con autenticación criptográfica.
-            </p>
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-slate-900/50">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+              <Lock className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white">
+                {initialData ? 'Editar Nota Cifrada' : 'Nueva Nota Confidencial'}
+              </h2>
+              <p className="text-[11px] text-emerald-400 font-mono">
+                Envelope Encryption • AES-256-GCM
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-mobbin-muted hover:text-mobbin-text transition-colors p-1.5 rounded-lg hover:bg-mobbin-surface cursor-pointer"
+            className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-xl hover:bg-white/10 cursor-pointer"
             title="Cerrar ventana"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modal Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-status-dangerBg border border-status-dangerBorder rounded-lg text-status-danger text-xs font-medium">
+            <div className="p-3 bg-rose-950/60 border border-rose-500/50 rounded-xl text-rose-300 text-xs font-medium">
               {error}
             </div>
           )}
 
-          {/* Title input */}
           <div>
             <div className="flex justify-between items-center mb-1.5 text-xs">
-              <label className="font-semibold text-mobbin-text uppercase tracking-wider">
-                Título de la Nota
-              </label>
-              <span className="text-mobbin-muted font-mono text-[11px]">
+              <label className="font-semibold text-slate-300">Título de la Nota</label>
+              <span className="text-slate-400 font-mono text-[11px]">
                 {title.length} / {MAX_TITLE_LENGTH}
               </span>
             </div>
@@ -102,72 +104,67 @@ export const NoteModal = ({ isOpen, onClose, onSave, initialData = null }) => {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ej. Llaves maestras de API..."
+              placeholder="Ej. Credenciales de Servidor de Producción..."
               maxLength={MAX_TITLE_LENGTH}
-              className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-mobbin-text text-sm placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors"
+              className="input-cyber w-full rounded-xl px-4 py-2.5 text-sm placeholder-slate-500"
               disabled={loading}
               autoFocus
             />
           </div>
 
-          {/* Content textarea */}
           <div>
             <div className="flex justify-between items-center mb-1.5 text-xs">
-              <label className="font-semibold text-mobbin-text uppercase tracking-wider">
-                Contenido Confidencial
-              </label>
+              <label className="font-semibold text-slate-300">Contenido Secreto</label>
               <span
                 className={`font-mono text-[11px] ${
                   isContentOverflow
-                    ? 'text-status-danger font-bold'
+                    ? 'text-rose-400 font-bold'
                     : contentRemaining < 100
-                    ? 'text-status-warning font-semibold'
-                    : 'text-mobbin-muted'
+                    ? 'text-amber-400 font-semibold'
+                    : 'text-slate-400'
                 }`}
               >
-                {content.length} / {MAX_CONTENT_LENGTH} chars (A06)
+                {content.length} / {MAX_CONTENT_LENGTH} chars
               </span>
             </div>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Escribe aquí tu información confidencial. Al guardar se cifrará con AES-256-GCM..."
+              placeholder="Escribe aquí tu nota confidencial. Se cifrará automáticamente con una llave de 256 bits antes de guardarse..."
               rows={7}
-              className="w-full bg-white border border-mobbin-border rounded-lg px-3.5 py-2.5 text-mobbin-text text-sm placeholder-mobbin-subtle focus:outline-none focus:border-mobbin-borderActive transition-colors font-sans resize-none leading-relaxed"
+              className="input-cyber w-full rounded-xl px-4 py-3 text-sm placeholder-slate-500 resize-none leading-relaxed font-sans"
               disabled={loading}
             />
           </div>
 
-          {/* Security badge footer inside modal */}
-          <div className="bg-mobbin-surface border border-mobbin-border rounded-lg p-3 flex items-center space-x-2 text-[11px] text-mobbin-muted">
-            <ShieldCheck className="w-4 h-4 text-status-success shrink-0" />
-            <span>Se generará un IV único de 12 bytes y AuthTag de 16 bytes al persistir en BD.</span>
+          <div className="bg-slate-900/90 border border-emerald-500/20 rounded-xl p-3 flex items-center space-x-2.5 text-[11px] text-slate-300">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Se computará un IV aleatorio de 96 bits y etiqueta de integridad GCM de 128 bits.</span>
           </div>
 
-          {/* Action buttons */}
-          <div className="pt-2 flex items-center justify-end space-x-2.5">
+          <div className="pt-2 flex items-center justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 rounded-lg text-xs sm:text-sm font-medium text-mobbin-muted hover:text-mobbin-text hover:bg-mobbin-surface transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading || isContentOverflow}
-              className="flex items-center gap-2 px-5 py-2 rounded-lg text-xs sm:text-sm font-medium bg-mobbin-dark hover:bg-mobbin-darkHover text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs cursor-pointer"
+              className="btn-cyber flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>Cifrando y Guardando...</span>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Cifrando Nota...</span>
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  <span>{initialData ? 'Actualizar Nota' : 'Cifrar y Guardar'}</span>
+                  <span>{initialData ? 'Recifrar y Actualizar' : 'Cifrar y Guardar'}</span>
                 </>
               )}
             </button>

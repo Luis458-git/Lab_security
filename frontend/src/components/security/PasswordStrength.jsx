@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, X, ShieldCheck, Shield } from 'lucide-react';
 
 export const PasswordStrength = ({ password = '' }) => {
   const criteria = [
@@ -14,10 +14,10 @@ export const PasswordStrength = ({ password = '' }) => {
   const scorePercent = (metCount / criteria.length) * 100;
 
   const getStrengthMeta = () => {
-    if (metCount <= 2) return { text: 'Insegura', color: 'bg-status-danger', textColor: 'text-status-danger' };
-    if (metCount === 3) return { text: 'Aceptable', color: 'bg-status-warning', textColor: 'text-status-warning' };
-    if (metCount === 4) return { text: 'Fuerte', color: 'bg-mobbin-dark', textColor: 'text-mobbin-text' };
-    return { text: 'Robusta (NIST SP 800-63B)', color: 'bg-status-success', textColor: 'text-status-success' };
+    if (metCount <= 2) return { text: 'Débil', color: 'from-rose-500 to-red-500', textColor: 'text-rose-400' };
+    if (metCount === 3) return { text: 'Aceptable', color: 'from-amber-500 to-yellow-400', textColor: 'text-amber-400' };
+    if (metCount === 4) return { text: 'Fuerte', color: 'from-emerald-500 to-teal-400', textColor: 'text-emerald-400' };
+    return { text: 'Blindada (NIST SP 800-63B)', color: 'from-emerald-400 via-teal-400 to-cyan-400', textColor: 'text-emerald-300' };
   };
 
   const meta = getStrengthMeta();
@@ -25,20 +25,25 @@ export const PasswordStrength = ({ password = '' }) => {
   if (!password) return null;
 
   return (
-    <div className="mt-2.5 p-3 rounded-lg bg-mobbin-surface border border-mobbin-border text-xs space-y-2">
-      <div className="flex items-center justify-between text-mobbin-text">
-        <span className="font-semibold text-[11px] uppercase tracking-wider">
-          Robustez de Contraseña (RF-01):
+    <div className="mt-3 p-3.5 rounded-xl bg-slate-900/80 border border-white/10 text-xs space-y-2.5 animate-slide-up">
+      <div className="flex items-center justify-between text-slate-300">
+        <span className="flex items-center gap-1.5 font-semibold">
+          {metCount === 5 ? (
+            <ShieldCheck className="w-4 h-4 text-emerald-400 animate-bounce" />
+          ) : (
+            <Shield className="w-4 h-4 text-slate-400" />
+          )}
+          Entropía de Contraseña:
         </span>
-        <span className={`font-semibold font-mono text-[11px] ${meta.textColor}`}>
+        <span className={`font-bold font-mono text-[11px] ${meta.textColor}`}>
           {meta.text}
         </span>
       </div>
 
-      {/* Progress Bar */}
-      <div className="h-1.5 w-full bg-mobbin-border rounded-full overflow-hidden">
+      {/* Animated Progress Bar */}
+      <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5">
         <div
-          className={`h-full transition-all duration-300 ${meta.color}`}
+          className={`h-full bg-gradient-to-r ${meta.color} transition-all duration-500 rounded-full shadow-[0_0_12px_rgba(16,185,129,0.5)]`}
           style={{ width: `${scorePercent}%` }}
         />
       </div>
@@ -48,14 +53,14 @@ export const PasswordStrength = ({ password = '' }) => {
         {criteria.map((c, i) => (
           <li
             key={i}
-            className={`flex items-center gap-1.5 transition-colors ${
-              c.met ? 'text-status-success font-medium' : 'text-mobbin-muted'
+            className={`flex items-center gap-1.5 transition-all duration-300 ${
+              c.met ? 'text-emerald-400 font-medium translate-x-0.5' : 'text-slate-500'
             }`}
           >
             {c.met ? (
-              <Check className="w-3.5 h-3.5 text-status-success shrink-0" />
+              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
             ) : (
-              <X className="w-3.5 h-3.5 text-mobbin-subtle shrink-0" />
+              <X className="w-3.5 h-3.5 text-slate-600 shrink-0" />
             )}
             <span>{c.label}</span>
           </li>
